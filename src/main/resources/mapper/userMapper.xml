@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.ux.jxxt.dao.UserDao">
+
+    <resultMap type="cn.ux.jxxt.domain.custom.UserCustom" id="userWithRolesRM">
+        <id column="id" property="id"/>
+        <result column="username" property="username"/>
+        <result column="password" property="password"/>
+        <result column="last_password_reset_datetime" property="lastPasswordResetDateTime"/>
+        <result column="enabled" property="enabled"/>
+        <result column="status" property="status"/>
+        <result column="type" property="type"/>
+        <collection property="roles" ofType="cn.ux.jxxt.domain.custom.RoleCustom" column="id"
+                    select="queryRoles"/>
+    </resultMap>
+
+    <resultMap type="cn.ux.jxxt.domain.custom.RoleCustom" id="roleWithPermissionsRM">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <collection property="permissions" ofType="cn.ux.jxxt.domain.Permission" column="id"
+                    select="queryPermissions"/>
+    </resultMap>
+
+    <select id="queryPermissions" parameterType="java.lang.Long" resultType="cn.ux.jxxt.domain.Permission">
+        select * from permission p left join role_permission rp on rp.permission_id=p.id where rp.role_id=#{id}
+    </select>
+
+    <select id="queryRoles" parameterType="java.lang.Long" resultMap="roleWithPermissionsRM">
+        select * from role r left join user_role ur on ur.role_id=r.id where ur.user_id=#{id}
+    </select>
+
+    <select id="queryUserById" parameterType="java.lang.String" resultMap="userWithRolesRM">
+        select * from user where id=#{userId}
+    </select>
+
+    <select id="queryUserByUsername" parameterType="java.lang.String" resultMap="userWithRolesRM">
+        select * from user where username=#{username}
+    </select>
+
+    <select id="queryUserByUserAccount" parameterType="java.lang.String" resultMap="userWithRolesRM">
+        select * from user where useraccount=#{userAccount}
+    </select>
+
+    <select id="getUserByUserAccount" parameterType="java.lang.String" resultType="cn.ux.jxxt.domain.custom.UserData">
+      select user.* ,user_group.group_id groupId
+      from user
+      left join user_group on user_group.user_id = user.id
+      where useraccount= #{userAccount}
+    </select>
+
+    <insert id="addAccount" parameterType="cn.ux.jxxt.domain.User" useGeneratedKeys="true" keyProperty="id">
+        insert into user(username,password,userAccount,register_date,status,user_type)
+        values
+        (#{username},#{password},#{userAccount},#{registerDateTime},"offline",#{type})
+    </insert>
+
+    <insert id="addUserRole">
+        insert into user_role (user_id,role_id) values (#{userId},#{roleId})
+    </insert>
+
+    <insert id="addUserGroup">
+        insert into user_group(user_id,group_id) values (#{userId},#{groupId})
+    </insert>
+
+    <delete id="deleteUserGroup">
+        delete from user_group where user_id = #{userId}
+    </delete>
+
+   <resultMap id="userWrapRM" type="cn.ux.jxxt.domain.custom.UserWrap">
+       <id column="id" property="id"/>
+       <result column="userName" property="userName"/>
+       <result column="userRole" property="role"/>
+       <result column="userGroup" property="group"/>
+       <result column="lastLoginTime" property="lastLoginTime"/>
+       <result column="userAccount" property="userAccount"/>
+   </resultMap>
+
+    <select id="queryUsers" resultMap="userWrapRM">
+        select
+        user.id,user.username userName,user.useraccount userAccount,
+        user.last_login_date_time lastLoginTime, user.user_type userRole,
+        user.user_group userGroup
+        from
+        user
+        order by ${sortBy}
+        <if test="desc == true">desc</if>
+        <if test="desc == false">asc</if>
+        limit #{offset},#{per_page}
+    </select>
+
+    <select id="getUserCounts" resultType="java.lang.Long">
+        select count(*) from user
+    </select>
+
+    <select id="getRoleId" resultType="java.lang.Long">
+        select id from role where name = #{rolename}
+    </select>
+
+    <select id="getWorkId" resultType="java.lang.Long">
+        select id from work_group where name = #{workname}
+    </select>
+
+    <update id="resetPassWord">
+        update user set password=#{password},last_password_reset_date=#{lastPasswordResetDateTime} where useraccount = #{userAccount}
+    </update>
+
+    <update id="updateLastTime">
+        update user set last_login_date_time = #{lastTime} where useraccount = #{userAccount}
+    </update>
+
+    <update id="setUserType">
+        update user set user_type = #{typeName} where useraccount = #{userAccount}
+    </update>
+
+    <update id="setUserGroup">
+        update user set user_group = #{groupName} where useraccount = #{userAccount}
+    </update>
+
+    <update id="resetUserData">
+        update user set
+        <trim suffixOverrides=",">
+            <if test="username != null">username = #{username},</if>
+            <if test="password != null">password = #{password},</if>
+            <if test="roleName != null">user_type = #{roleName},</if>
+            <if test="groupName != null">user_group = #{groupName},</if>
+            <if test="lastPasswordResetDateTime != null">last_login_date_time = #{lastPasswordResetDateTime},</if>
+        </trim>
+        where useraccount = #{userAccount}
+    </update>
+
+    <select id="getUserInfo" resultType="cn.ux.jxxt.domain.custom.UserWrap">
+        select user.username userName,user.useraccount userAccount from user where useraccount = #{userAccount}
+    </select>
+
+    <select id="getGroups" resultType="cn.ux.jxxt.domain.WorkGroup">
+        select wg.id, wg.name gName,wg.head_man headMan,wg.deputy_leader deputyLeader
+        from work_group wg
+        left join user_group on user_group.group_id = wg.id
+        where user_group.user_id = #{userId}
+    </select>
+
+    <select id="queryRolesNoPermission" parameterType="java.lang.Long" resultType="cn.ux.jxxt.domain.custom.RoleCustom">
+        select * from role r left join user_role ur on ur.role_id=r.id where ur.user_id=#{id}
+    </select>
+
+    <select id="getUserRoleById" resultType="cn.ux.jxxt.domain.UserRole">
+        select * from user_role where role_id = #{roleId}
+    </select>
+
+    <select id="getUserGroupById" resultType="cn.ux.jxxt.domain.UserGroup">
+        select * from user_group where group_id = #{groupId}
+    </select>
+
+    <update id="updateUserRole">
+        update user_role set role_id = #{roleId} where user_id = #{userId}
+    </update>
+
+    <update id="updateUserGroup">
+        update user_group set group_id = #{groupId} where user_id = #{userId}
+    </update>
+
+    <delete id="deleteGroup">
+        delete from user_group where user_id = #{userId}
+    </delete>
+
+    <delete id="deleteRole">
+        delete from user_role where user_id = #{userId}
+    </delete>
+
+    <delete id="deleteUser">
+        delete from user where useraccount = #{userAccount}
+    </delete>
+
+    <select id="getUser" resultMap="userWrapRM">
+        select user.id ,user.username,user.useraccount from user
+    </select>
+
+    <select id="getUserByAccounts" resultMap="userWrapRM">
+        select user.id ,user.username,user.useraccount from user where useraccount = #{userAccount}
+    </select>
+
+    <select id="getChargeAccount" resultType="java.lang.String">
+        select distinct project_charge_account from project_plan
+    </select>
+
+    <select id="getUserForBusiness" resultMap="userWrapRM">
+        select user.id ,user.username,user.useraccount from user where user_type like '%业务负责人%'
+    </select>
+</mapper>

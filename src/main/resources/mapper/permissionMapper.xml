@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.ux.jxxt.dao.PermissionDao">
+
+    <select id="queryUnselectedPermissions" resultType="cn.ux.jxxt.domain.Permission">
+      select * from permission where id not in(select p.id from permission p left join role_permission rp on
+      p.id = rp.permission_id where rp.role_id = #{roleId})
+    </select>
+
+    <select id="findPermissionById" resultType="cn.ux.jxxt.domain.Permission">
+        select * from permission where id=#{permissionId}
+    </select>
+
+    <select id="findPermissions" resultType="cn.ux.jxxt.domain.Permission">
+        select * from permission
+    </select>
+</mapper>

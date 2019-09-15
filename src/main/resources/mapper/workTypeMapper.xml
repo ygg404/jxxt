@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.ux.jxxt.dao.WorkTypeDao">
+    <resultMap id="typeRM" type="cn.ux.jxxt.domain.WorkType">
+        <id column="id" property="id"/>
+        <result column="type_name" property="typeName"/>
+        <result column="unit" property="typeUnit"/>
+        <result column="unit_output" property="typeOutput"/>
+        <result column="start_date_time" property="startTime"/>
+        <result column="update_date_time" property="updateTime"/>
+    </resultMap>
+
+    <select id="getAllType" resultMap="typeRM">
+        select * from work_type
+    </select>
+
+    <select id="getTypeByName" parameterType="java.lang.String" resultMap="typeRM">
+        select * from work_type where type_name = #{typeName}
+    </select>
+
+    <select id="getTypeById" parameterType="java.lang.Long" resultMap="typeRM">
+        select * from work_type where id = #{typeId}
+    </select>
+
+    <update id="updateById" parameterType="cn.ux.jxxt.domain.WorkType">
+        update work_type set
+        type_name = #{typeName},
+        unit = #{typeUnit},
+        unit_output = #{typeOutput},
+        update_date_time = #{updateTime}
+        where id = #{id}
+    </update>
+
+    <insert id="insertWorkType" parameterType="cn.ux.jxxt.domain.WorkType">
+        insert into work_type(type_name,unit,unit_output,start_date_time,update_date_time)
+        values (#{typeName},#{typeUnit},#{typeOutput},#{startTime},#{updateTime})
+    </insert>
+
+    <delete id="deleteType">
+        delete from work_type where id = #{typeId}
+    </delete>
+
+    <select id="getTypeNum" resultType="java.lang.Long">
+        select count(id) from work_type
+        <if test="search != null">where (type_name like '%${search}%')</if>
+    </select>
+
+    <select id="queryTypesPaginated" resultMap="typeRM">
+        select * from work_type
+        <if test="search != null">where (type_name like '%${search}%')</if>
+        order by
+        ${sortBy}
+        <choose>
+            <when test="desc == true">desc</when>
+            <otherwise>asc</otherwise>
+        </choose>
+        limit #{offset},#{per_page}
+    </select>
+</mapper>

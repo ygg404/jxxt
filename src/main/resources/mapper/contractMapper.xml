@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.ux.jxxt.dao.ContractDao">
+    <resultMap id="contractRM" type="cn.ux.jxxt.domain.ContractData">
+        <id column="id" property="id"/>
+        <result column="contractNo" property="contractNo"/>
+        <result column="contractAddTime" property="contractAddTime"/>
+        <result column="contractCreateTime" property="contractCreateTime"/>
+        <result column="contractAuthorize" property="contractAuthorize"/>
+        <result column="contractName" property="contractName"/>
+        <result column="typeId" property="typeId"/>
+        <result column="contractNote" property="contractNote"/>
+        <result column="contractBusiness" property="contractBusiness"/>
+        <result column="projectType" property="projectType"/>
+        <result column="contractMoney" property="contractMoney"/>
+        <result column="contractUserName" property="contractUserName"/>
+        <result column="contractUserPhone" property="contractUserPhone"/>
+        <result column="fileName" property="fileName"/>
+    </resultMap>
+
+    <select id="getContractData" resultMap="contractRM">
+        select p.id id,p.contract_no contractNo,p.contract_add_time contractAddTime,
+        p.contract_create_time contractCreateTime,p.contract_authorize contractAuthorize,
+        p.contract_name contractName,p.contract_type typeId,p.contract_note contractNote,
+        p.contract_business contractBusiness,p.contract_money contractMoney,
+        p.project_type projectType,contract_file.fileName fileName,
+        pu.user_name contractUserName,pu.user_phone contractUserPhone
+        from project_contract p
+        left join project_user pu on p.contract_no = pu.contract_no
+        left join contract_file on contract_file.contract_no = p.contract_no
+        where p.contract_stage = 1
+        <if test="startDate != null">
+            and p.contract_add_time between '${startDate}' and '${endDate}'
+        </if>
+
+        <if test="search != null">and (p.contract_no like '%${search}%'
+            or p.contract_authorize like '%${search}%'
+            or p.contract_name like '%${search}%')
+        </if>
+        order by ${sortBy}
+        <choose>
+            <when test="desc == true">desc</when>
+            <otherwise>asc</otherwise>
+        </choose>
+        limit #{offset},#{per_page}
+    </select>
+
+    <insert id="addContractNoAddTime" parameterType="cn.ux.jxxt.domain.ContractData">
+        insert into project_contract(contract_no,contract_name,contract_create_time,contract_authorize,contract_type,contract_note,contract_business,contract_money,contract_stage,project_type)
+        values(#{contractNo},#{contractName},#{contractCreateTime},#{contractAuthorize},#{typeId},#{contractNote},#{contractBusiness},#{contractMoney},1,#{projectType})
+    </insert>
+
+    <insert id="addContract" parameterType="cn.ux.jxxt.domain.ContractData">
+        insert into project_contract(contract_no,contract_add_time,contract_name,contract_create_time,contract_authorize,contract_type,contract_note,contract_business,contract_money,contract_stage,project_type)
+        values(#{contractNo},#{contractAddTime},#{contractName},#{contractCreateTime},#{contractAuthorize},#{typeId},#{contractNote},#{contractBusiness},#{contractMoney},1,#{projectType})
+    </insert>
+
+    <insert id="addContractUser" parameterType="cn.ux.jxxt.domain.ContractData">
+        insert into project_user(user_name,user_phone,contract_no)
+        values (#{contractUserName},#{contractUserPhone},#{contractNo})
+    </insert>
+
+    <delete id="deleteContractUserByNo">
+        delete from project_user where contract_no = #{contractNo}
+    </delete>
+    <update id="updateUser" parameterType="cn.ux.jxxt.domain.ContractData">
+        update project_user set
+        <trim suffixOverrides=",">
+            <if test="contractNo != null">contract_no = #{contractNo},</if>
+            <if test="contractUserName != null">user_name = #{contractUserName},</if>
+            <if test="contractUserPhone != null">user_phone = #{contractUserPhone}</if>
+        </trim>
+        where contract_no = #{contractNo}
+    </update>
+
+    <select id="getContractByNo" resultMap="contractRM">
+        select p.id id,p.contract_no contractNo,p.contract_add_time contractAddTime,
+        p.contract_create_time contractCreateTime,p.contract_authorize contractAuthorize,
+        p.contract_name contractName,p.contract_type typeId,p.contract_note contractNote,
+        p.contract_business contractBusiness,p.contract_money contractMoney,
+        p.project_type projectType,
+        pu.user_name contractUserName,pu.user_phone contractUserPhone
+        from project_contract p
+        left join project_user pu on p.contract_no = pu.contract_no
+        where p.contract_no = #{contractNo}
+    </select>
+
+    <delete id="deleteContractByNo">
+        delete from project_contract where contract_no = #{contractNo}
+    </delete>
+
+    <select id="getContractCount" resultType="java.lang.Long">
+        select count(*) from project_contract p
+        where p.contract_stage = 1
+        <if test="startDate != null">
+            and p.contract_add_time between '${startDate}' and '${endDate}'
+        </if>
+
+        <if test="search != null">and (p.contract_no like '%${search}%'
+            or p.contract_authorize like '%${search}%'
+            or p.contract_name like '%${search}%')
+        </if>
+    </select>
+
+    <update id="updateContract">
+        update project_contract set
+        <trim suffixOverrides=",">
+            <if test="contractNo != null">contract_no = #{contractNo},</if>
+            <if test="contractName != null">contract_name = #{contractName},</if>
+            <if test="contractAuthorize != null">contract_authorize = #{contractAuthorize},</if>
+            <if test="contractNote != null">contract_note = #{contractNote},</if>
+            <if test="typeId != null">contract_type = #{typeId},</if>
+            <if test="contractBusiness != null">contract_business = #{contractBusiness},</if>
+            <if test="contractMoney != null">contract_money = #{contractMoney},</if>
+            <if test="contractAddTime != null">contract_add_time = #{contractAddTime},</if>
+            <if test="projectType != null">project_type = #{projectType}</if>
+        </trim>
+        where contract_no = #{contractNo}
+    </update>
+
+    <insert id="addProjectToContract" parameterType="cn.ux.jxxt.domain.ContractData">
+        insert into contract_project(project_no,contract_no)
+        values (#{projectNo},#{contractNo})
+    </insert>
+
+    <update id="updateProjectContract" parameterType="cn.ux.jxxt.domain.ContractData">
+        update contract_project set project_no = #{projectNo},contract_no = #{contractNo} where contract_no = #{contractNo}
+    </update>
+
+    <delete id="deleteProjectContract">
+        delete from contract_project where project_no = #{projectNo}
+    </delete>
+
+    <delete id="deleteContractFile">
+        delete from contract_file where contract_no = #{contractNo}
+    </delete>
+
+    <select id="getContractUnselected" resultMap="contractRM">
+        select p.id id,p.contract_no contractNo,p.contract_add_time contractAddTime,
+        p.contract_create_time contractCreateTime,p.contract_authorize contractAuthorize,
+        p.contract_name contractName,p.contract_type typeId,p.contract_note contractNote,
+        p.contract_business contractBusiness,p.contract_money contractMoney
+        from project_contract p where contract_no
+        not in (select contract_no from contract_project)
+    </select>
+
+    <select id="getLastId" resultType="java.lang.Long">
+        select LAST_INSERT_ID()
+    </select>
+
+    <update id="updateContractNo">
+        update project_contract set contract_no = #{contractNo} where project_no = #{oldNo}
+    </update>
+
+    <select id="getContractNumList" resultType="String">
+        SELECT contract_no from project_contract where contract_no like concat(#{ymstr},'%')
+    </select>
+</mapper>

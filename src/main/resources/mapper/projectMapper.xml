@@ -1,0 +1,1261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.ux.jxxt.dao.ProjectDao">
+    <resultMap id="projectRM" type="cn.ux.jxxt.dto.ProjectDTO">
+        <id column="id" property="id"/>
+        <result column="project_name" property="projectName"/>
+        <result column="project_no" property="projectNo"/>
+        <result column="project_num" property="projectNum"/>
+        <result column="project_type" property="projectType"/>
+        <result column="project_money" property="projectMoney"/>
+        <result column="project_authorize" property="projectAuthorize"/>
+        <result column="project_user_name" property="userName"/>
+        <result column="project_user_phone" property="userPhone"/>
+        <result column="project_note" property="projectNote"/>
+        <result column="project_charge" property="projectCharge"/>
+        <result column="project_stage" property="projectStage"/>
+        <result column="project_start_date_time" property="projectStartDateTime"/>
+        <result column="project_create_date_time" property="projectCreateDateTime"/>
+    </resultMap>
+
+    <resultMap id="projectUserRM" type="cn.ux.jxxt.domain.ProjectUser">
+        <id column="id" property="id"/>
+        <result column="user_name" property="userName"/>
+        <result column="user_phone" property="userPhone"/>
+        <result column="project_no" property="projectNo"/>
+        <result column="contract_no" property="contractNo"/>
+    </resultMap>
+
+    <resultMap id="projectWrapRM" type="cn.ux.jxxt.domain.custom.ProjectWrap">
+        <id column="id" property="id"/>
+        <result column="projectNo" property="projectNo"/>
+        <result column="projectNum" property="projectNum"/>
+        <result column="projectName" property="projectName"/>
+        <result column="projectType" property="projectType"/>
+        <result column="projectAuthorize" property="projectAuthorize"/>
+        <result column="projectStartTime" property="projectStartTime"/>
+        <result column="projectStage" property="projectStage"/>
+        <result column="projectUser" property="projectUser"/>
+        <result column="projectCharge" property="projectCharge"/>
+        <result column="projectSetUp" property="projectSetUp"/>
+        <result column="projectStageId" property="projectStageId"/>
+        <result column="projectUserName" property="projectUserName"/>
+        <result column="projectUserPhone" property="projectUserPhone"/>
+        <result column="contractNote" property="contractNote"/>
+        <result column="contractBusiness" property="contractBusiness"/>
+        <result column="contractMoney" property="contractMoney"/>
+        <result column="projectProduce" property="projectProduce"/>
+        <result column="projectNote" property="projectNote"/>
+        <result column="projectRate" property="projectRate"/>
+        <result column="groupName" property="groupName"/>
+        <result column="workStage" property="workStage"/>
+        <result column="groupId" property="groupId"/>
+        <result column="group_id" property="group_id"/>
+        <result column="chargeAccount" property="chargeAccount"/>
+        <result column="contractNo" property="contractNo"/>
+        <result column="projectActuallyOutput" property="projectActuallyOutput"/>
+    </resultMap>
+
+    <resultMap id="outputRM" type="cn.ux.jxxt.domain.custom.OutPutWrap">
+        <id column="id" property="id"/>
+        <result column="type_id" property="typeId"/>
+        <result column="project_ratio" property="projectRatio"/>
+        <result column="work_load" property="workLoad"/>
+    </resultMap>
+
+    <resultMap id="outPutDataRM" type="cn.ux.jxxt.domain.custom.ProjectOutPutWrap">
+        <id column="id" property="id"/>
+        <result column="projectName" property="projectName"/>
+        <result column="projectType" property="projectType"/>
+        <result column="projectAuthorize" property="projectAuthorize"/>
+        <result column="projectNote" property="projectNote"/>
+        <result column="projectUserName" property="projectUserName"/>
+        <result column="projectPhone" property="projectPhone"/>
+        <result column="projectCharge" property="projectCharge"/>
+        <result column="projectSetup" property="projectSetup"/>
+        <result column="projectWriter" property="projectWriter"/>
+        <result column="projectBusiness" property="projectBusiness"/>
+        <result column="projectProduce" property="projectProduce"/>
+        <result column="projectStartTime" property="projectStartTime"/>
+        <result column="projectEndTime" property="projectEndTime"/>
+        <result column="projectStage" property="projectStage"/>
+        <result column="projectExe" property="projectExe"/>
+        <result column="projectWorkNote" property="projectWorkNote"/>
+        <result column="projectWorkRequire" property="projectWorkRequire"/>
+        <result column="disclosureNote" property="disclosureNote"/>
+        <result column="checkSuggestion" property="checkSuggestion"/>
+        <result column="dataName" property="dataName"/>
+        <result column="briefSummary" property="briefSummary"/>
+        <result column="workLoad" property="workLoad"/>
+        <result column="qualityNote" property="qualityNote"/>
+        <result column="qualitySuggestion" property="qualitySuggestion"/>
+        <result column="qualityScore" property="qualityScore"/>
+        <result column="projectOutPut" property="projectOutPut"/>
+        <result column="projectOutPutNote" property="projectOutPutNote"/>
+        <result column="projectWorkLoad" property="projectWorkLoad"/>
+        <result column="projectBegunDate" property="projectBegunDate"/>
+        <result column="shortDateTime" property="shortDateTime"/>
+        <result column="lastDateTime" property="lastDateTime"/>
+        <result column="workName" property="workName"/>
+    </resultMap>
+
+    <select id="getProjects" resultMap="projectWrapRM">
+        select project.id,project.project_no projectNo,project.project_name projectName,project.project_authorize
+        projectAuthorize,project.project_stage projectStageId,project.project_produce projectProduce,
+        project.project_start_date_time projectStartTime,project.project_charge projectSetUp,project.project_num
+        projectNum,project.project_type projectType,project_stage.name projectStage,
+        project_plan.project_charge projectCharge,project_contract.contract_note contractNote,project_contract.contract_no contractNo,
+        project_contract.contract_business contractBusiness,project_contract.contract_money contractMoney,
+        project_user.user_name projectUserName,project_user.user_phone projectUserPhone,project_work.project_stage workStage,
+        project_work.group_id groupId,
+        user.username projectUser
+        from project
+        left join project_work on project.project_no = project_work.project_no
+        left join project_stage on project_stage.id = project.project_stage
+        left join user_project on project.project_no = user_project.project_no
+        left join user on user_project.user_id = user.id
+        left join project_plan on  project_plan.project_no=project.project_no
+        left join contract_project on  project.project_no=contract_project.project_no
+        left join project_user on contract_project.contract_no = project_user.contract_no
+        left join project_contract on project_user.contract_no = project_contract.contract_no
+        <choose>
+            <when test="p_stage == 1">where p_stage = 1</when>
+            <otherwise>where p_stage = 2</otherwise>
+        </choose>
+        <if test="userAccount != null">and project.project_charge_account = #{userAccount}</if>
+        <if test="groupId > 0">and project_group.group_id = #{groupId}</if>
+        <if test="stageId != null">
+            <choose>
+                <when test="stageId == 5">
+                    and (project.project_stage = 5 or project.project_stage = 6 or project.project_stage = 9)
+                </when>
+                <otherwise>
+                    and project.project_stage = #{stageId}
+                </otherwise>
+            </choose>
+        </if>
+        <choose>
+            <when test="startDate != null">
+                and project.project_start_date_time between '${startDate}' and '${endDate}'
+            </when>
+            <otherwise>and DATE_FORMAT(project.project_start_date_time,'%Y%m')=DATE_FORMAT(CURDATE(),'%Y%m')</otherwise>
+        </choose>
+        <if test="search != null">and (project.project_no like '%${search}%'
+            or project.project_name like '%${search}%'
+            or project.project_num like '%${search}%'
+            or project.project_type like '%${search}%')
+        </if>
+        order by ${sortBy}
+        <choose>
+            <when test="desc == true">desc</when>
+            <otherwise>asc</otherwise>
+        </choose>
+        limit #{offset},#{per_page}
+    </select>
+
+    <select id="getProjectsByWork" resultMap="projectWrapRM">
+        select project.id,project.project_no projectNo,project.project_name projectName,project.project_authorize
+        projectAuthorize,project.project_stage projectStageId,project.project_produce projectProduce,
+        project.project_start_date_time projectStartTime,project.project_charge projectSetUp,project.project_num
+        projectNum,project.project_type projectType,project_stage.name projectStage,
+        project_plan.project_charge projectCharge,project_contract.contract_note contractNote,project_contract.contract_no contractNo,
+        project_contract.contract_business contractBusiness,project_contract.contract_money contractMoney,
+        project_user.user_name projectUserName,project_user.user_phone projectUserPhone,project_work.project_stage workStage,
+        project_work.group_id groupId,project.project_charge_account chargeAccount,
+        user.username projectUser
+        from project
+        left join project_work on project.project_no = project_work.project_no
+        left join project_stage on project_stage.id = project.project_stage
+        left join user_project on project.project_no = user_project.project_no
+        left join user on user_project.user_id = user.id
+        left join project_plan on  project_plan.project_no=project.project_no
+        left join contract_project on  project.project_no=contract_project.project_no
+        left join project_user on contract_project.contract_no = project_user.contract_no
+        left join project_contract on project_user.contract_no = project_contract.contract_no
+        <if test="groupId>0">
+            left join project_group on project_group.project_no = project.project_no
+        </if>
+        <choose>
+            <when test="p_stage == 1">where p_stage = 1</when>
+            <otherwise>where p_stage = 2</otherwise>
+        </choose>
+        <if test="groupId > 0">and project_group.group_id = #{groupId}</if>
+        <if test="stageId != null">and project.project_stage = #{stageId}</if>
+        <choose>
+            <when test="startDate != null">
+                and project.project_start_date_time between '${startDate}' and '${endDate}'
+            </when>
+            <otherwise>and DATE_FORMAT(project.project_start_date_time,'%Y%m')=DATE_FORMAT(CURDATE(),'%Y%m')</otherwise>
+        </choose>
+        <if test="search != null">and (project.project_no like '%${search}%'
+            or project.project_name like '%${search}%'
+            or project.project_num like '%${search}%'
+            or project.project_type like '%${search}%')
+        </if>
+        order by ${sortBy}
+        <choose>
+            <when test="desc == true">desc</when>
+            <otherwise>asc</otherwise>
+        </choose>
+        limit #{offset},#{per_page}
+    </select>
+
+    <select id="getProjectsByAccount" resultMap="projectWrapRM">
+        select project.id,project.project_no projectNo,project.project_name projectName,project.project_authorize
+        projectAuthorize,project.project_stage projectStageId,project.project_produce projectProduce,
+        project.project_start_date_time projectStartTime,project.project_charge projectSetUp,project.project_num
+        projectNum,project.project_type projectType,project_stage.name projectStage,
+        project_plan.project_charge projectCharge,project_contract.contract_note contractNote,project_contract.contract_no contractNo,
+        project_contract.contract_business contractBusiness,project_contract.contract_money contractMoney,
+        project_user.user_name projectUserName,project_user.user_phone projectUserPhone,project_work.project_stage workStage,
+        project_work.group_id groupId,
+        user.username projectUser
+        from project
+        left join project_work on project.project_no = project_work.project_no
+        left join project_stage on project_stage.id = project.project_stage
+        left join user_project on project.project_no = user_project.project_no
+        left join user on user_project.user_id = user.id
+        left join project_plan on  project_plan.project_no=project.project_no
+        left join contract_project on  project.project_no=contract_project.project_no
+        left join project_user on contract_project.contract_no = project_user.contract_no
+        left join project_contract on project_user.contract_no = project_contract.contract_no
+        <choose>
+            <when test="p_stage == 1">where p_stage = 1</when>
+            <otherwise>where p_stage = 2</otherwise>
+        </choose>
+        <if test="userAccount != null">and project.project_charge_account = #{userAccount}</if>
+        <if test="groupId > 0">and project_group.group_id = #{groupId}</if>
+        <if test="stageId != null">and project.project_stage = #{stageId}</if>
+        <choose>
+            <when test="startDate != null">
+                and project.project_start_date_time between '${startDate}' and '${endDate}'
+            </when>
+            <otherwise>and project.project_start_date_time > DATE_SUB(CURDATE(), INTERVAL 2 MONTH) </otherwise>
+        </choose>
+        <if test="search != null">and (project.project_no like '%${search}%'
+            or project.project_name like '%${search}%'
+            or project.project_num like '%${search}%'
+            or project.project_type like '%${search}%')
+        </if>
+        order by ${sortBy}
+        <choose>
+            <when test="desc == true">desc</when>
+            <otherwise>asc</otherwise>
+        </choose>
+        limit #{offset},#{per_page}
+    </select>
+
+    <select id="getRecycleProject" resultMap="projectWrapRM">
+        select project.id,project.project_no projectNo,project.project_name projectName,project.project_authorize
+        projectAuthorize,project.project_stage projectStageId,project.project_produce projectProduce,
+        project.project_start_date_time projectStartTime,project.project_charge projectSetUp,project.project_num
+        projectNum,project.project_type projectType,project_stage.name projectStage,
+        project_plan.project_charge projectCharge,project_contract.contract_note contractNote,
+        project_contract.contract_business contractBusiness,project_contract.contract_money contractMoney,
+        project_user.user_name projectUserName,project_user.user_phone projectUserPhone,project_work.project_stage workStage,
+        project_work.group_id groupId,project_contract.contract_no contractNo,
+        user.username projectUser
+        from project
+        left join project_work on project.project_no = project_work.project_no
+        left join project_stage on project_stage.id = project.project_stage
+        left join user_project on project.project_no = user_project.project_no
+        left join user on user_project.user_id = user.id
+        left join project_plan on  project_plan.project_no=project.project_no
+        left join contract_project on  project.project_no=contract_project.project_no
+        left join project_user on contract_project.contract_no = project_user.contract_no
+        left join project_contract on project_user.contract_no = project_contract.contract_no
+        <choose>
+            <when test="p_stage == 1">where p_stage = 1</when>
+            <otherwise>where p_stage = 2</otherwise>
+        </choose>
+        <if test="userAccount != null">and project.project_charge_account = #{userAccount}</if>
+        <if test="groupId > 0">and project_group.group_id = #{groupId}</if>
+        <if test="stageId != null">and project.project_stage = #{stageId}</if>
+        <if test="startDate != null">
+            and project.project_start_date_time between '${startDate}' and '${endDate}'
+        </if>
+        <if test="search != null">and (project.project_no like '%${search}%'
+            or project.project_name like '%${search}%'
+            or project.project_num like '%${search}%'
+            or project.project_type like '%${search}%')
+        </if>
+        order by ${sortBy}
+        <choose>
+            <when test="desc == true">desc</when>
+            <otherwise>asc</otherwise>
+        </choose>
+        limit #{offset},#{per_page}
+    </select>
+
+    <select id="getProjectBySetUp" resultMap="projectRM">
+        select project.id,project.project_name,project.project_no,project.project_money,project.project_authorize,
+        project.project_charge,project.project_note,project.project_start_date_time,project.project_type project_type,
+        project.project_num project_num,
+		project_stage.name project_stage,
+        project_user.user_name project_user_name,
+        project_user.user_phone project_user_phone
+        from project
+        left join project_user on project.project_no = project_user.project_no
+		left join project_stage on project_stage.id = project.project_stage
+		where project.project_no = #{project_no}
+    </select>
+
+    <insert id="addProject" parameterType="cn.ux.jxxt.domain.Project">
+        insert into project(project_name,project_no,project_money,project_authorize,
+        project_note,project_charge,project_start_date_time,project_create_date_time,
+        p_stage,project_num,project_type,project_stage,project_produce)
+        values
+        (#{projectName},#{projectNo},#{projectMoney},#{projectAuthorize},#{projectNote},
+        #{projectCharge},#{projectStartDateTime},#{projectCreateDateTime},#{pStage},
+        #{projectNum},#{projectType},#{projectStageId},#{projectProduce})
+    </insert>
+
+    <update id="updateProjectNo">
+        update project set project_no = #{projectNo} where project_no = #{oldNo}
+    </update>
+
+    <select id="getLastId" resultType="java.lang.Long">
+        select LAST_INSERT_ID()
+    </select>
+
+    <insert id="addProjectType">
+        insert into p_type(project_no,type_id,stage_id)
+        values
+        (#{p_no},#{t_id},#{stage_id})
+    </insert>
+
+    <insert id="addSetUpUser">
+        insert into user_project(user_id,project_no)
+        values
+        (#{user_id},#{project_no})
+    </insert>
+
+    <insert id="addProjectUser">
+        insert into project_user(user_name,user_phone,project_no)
+        values
+        (#{userName},#{userPhone},#{projectNo})
+    </insert>
+
+    <update id="updateProjectUserOfContract">
+        update project_user set project_no = #{projectNo} where contract_no = #{contractNo}
+    </update>
+
+    <insert id="addOutPutData">
+        insert into check_output(type_id,project_no,project_ratio,work_load,group_id)
+        values
+        (#{typeId},#{projectNo},#{projectRatio},#{workLoad},#{groupId})
+    </insert>
+
+    <insert id="addAccountingOutput">
+        insert into project_accounting_output(project_output,project_no)
+        values (#{projectOutput},#{projectNo})
+    </insert>
+
+    <update id="updateAccountingOutput">
+        update project_accounting_output set project_output = #{projectOutput} where project_no = #{projectNo}
+    </update>
+
+    <select id="getAccountingOutput" resultType="java.lang.String">
+        select project_no from project_accounting_output where project_no = #{projectNo}
+    </select>
+
+    <update id="updateOutPutData">
+        update check_output set
+        <trim suffixOverrides=",">
+            <if test="projectNo != null">project_no = #{projectNo},</if>
+            <if test="projectRatio != null">project_ratio = #{projectRatio},</if>
+            <if test="workLoad != null">work_load = #{workLoad},</if>
+            <if test="groupId != null">group_id = #{groupId}</if>
+        </trim>
+        where project_no = #{projectNo} and type_id = #{typeId} and group_id = #{groupId}
+    </update>
+
+    <select id="getOutPutDataByTypeId" resultMap="outputRM">
+      select * from check_output where type_id = #{typeId} and project_no = #{projectNo} and group_id = #{groupId}
+    </select>
+
+    <select id="getProjectByNo" parameterType="java.lang.String" resultMap="projectRM">
+        select * from project where project_no = #{p_no}
+    </select>
+
+    <select id="getProjectUserByNo" parameterType="java.lang.String" resultMap="projectUserRM">
+        select * from project_user where project_no = #{projectNo}
+    </select>
+
+    <select id="getProjectCount" resultType="java.lang.Long">
+        select count(*) from project <choose>
+        <when test="p_stage == 1">where p_stage = 1</when>
+        <otherwise>where p_stage = 2</otherwise>
+    </choose>
+        <if test="userAccount != null">and project.project_charge_account = #{userAccount}</if>
+        <if test="groupId > 0">and project_group.group_id = #{groupId}</if>
+        <if test="stageId != null">
+          <choose>
+              <when test="stageId == 5">
+                  and project.project_stage = 5 or project.project_stage = 6 or project.project_stage = 9
+              </when>
+              <otherwise>
+                  and project.project_stage = #{stageId}
+              </otherwise>
+          </choose>
+        </if>
+        <choose>
+            <when test="startDate != null">
+                and project.project_start_date_time between '${startDate}' and '${endDate}'
+            </when>
+            <otherwise>and DATE_FORMAT(project.project_start_date_time,'%Y%m')=DATE_FORMAT(CURDATE(),'%Y%m')</otherwise>
+        </choose>
+        <if test="search != null">and (project.project_no like '%${search}%'
+            or project.project_name like '%${search}%'
+            or project.project_num like '%${search}%'
+            or project.project_type like '%${search}%')
+        </if>
+    </select>
+
+    <select id="getProjectCountByWork" resultType="java.lang.Long">
+        select count(*) from project
+        left join project_group on project_group.project_no = project.project_no
+        <choose>
+        <when test="p_stage == 1">where p_stage = 1</when>
+        <otherwise>where p_stage = 2</otherwise>
+    </choose>
+        <if test="groupId > 0">and project_group.group_id = #{groupId}</if>
+        <if test="stageId != null">and project.project_stage = #{stageId}</if>
+        <choose>
+            <when test="startDate != null">
+                and project.project_start_date_time between '${startDate}' and '${endDate}'
+            </when>
+            <otherwise>and DATE_FORMAT(project.project_start_date_time,'%Y%m')=DATE_FORMAT(CURDATE(),'%Y%m')</otherwise>
+        </choose>
+        <if test="search != null">and (project.project_no like '%${search}%'
+            or project.project_name like '%${search}%'
+            or project.project_num like '%${search}%'
+            or project.project_type like '%${search}%')
+        </if>
+    </select>
+
+    <select id="getProjectCountByAccount" resultType="java.lang.Long">
+        select count(*) from project <choose>
+        <when test="p_stage == 1">where p_stage = 1</when>
+        <otherwise>where p_stage = 2</otherwise>
+    </choose>
+        <if test="userAccount != null">and project.project_charge_account = #{userAccount}</if>
+        <if test="groupId > 0">and project_group.group_id = #{groupId}</if>
+        <if test="stageId != null">and project.project_stage = #{stageId}</if>
+        <choose>
+            <when test="startDate != null">
+                and project.project_start_date_time between '${startDate}' and '${endDate}'
+            </when>
+            <otherwise>and project.project_start_date_time > DATE_SUB(CURDATE(), INTERVAL 2 MONTH) </otherwise>
+        </choose>
+        <if test="search != null">and (project.project_no like '%${search}%'
+            or project.project_name like '%${search}%'
+            or project.project_num like '%${search}%'
+            or project.project_type like '%${search}%')
+        </if>
+    </select>
+
+    <select id="getRecycleCount" resultType="java.lang.Long">
+        select count(*) from project <choose>
+        <when test="p_stage == 1">where p_stage = 1</when>
+        <otherwise>where p_stage = 2</otherwise>
+    </choose>
+        <if test="userAccount != null">and project.project_charge_account = #{userAccount}</if>
+        <if test="groupId > 0">and project_group.group_id = #{groupId}</if>
+        <if test="stageId != null">and project.project_stage = #{stageId}</if>
+        <if test="startDate != null">
+            and project.project_start_date_time between '${startDate}' and '${endDate}'
+        </if>
+        <if test="search != null">and (project.project_no like '%${search}%'
+            or project.project_name like '%${search}%'
+            or project.project_num like '%${search}%'
+            or project.project_type like '%${search}%')
+        </if>
+    </select>
+
+    <select id="getProjectCounts" resultType="java.lang.Long">
+        select id from project
+    </select>
+
+    <update id="addExamineNote">
+        update project set examine_note = #{project_note} where project_no = #{p_no}
+    </update>
+
+    <update id="updateProject" parameterType="cn.ux.jxxt.domain.Project">
+        update project set
+        <trim suffixOverrides=",">
+            <if test="projectNo != null">project_no = #{projectNo},</if>
+            <if test="projectName != null">project_name = #{projectName},</if>
+            <if test="projectMoney != null">project_money = #{projectMoney},</if>
+            <if test="projectNum != null">project_num = #{projectNum},</if>
+            <if test="projectAuthorize != null">project_authorize = #{projectAuthorize},</if>
+            <if test="projectNote != null">project_note = #{projectNote},</if>
+            <if test="projectCharge != null">project_charge = #{projectCharge},</if>
+            <if test="projectStageId != 0">project_stage = #{projectStageId},</if>
+            <if test="projectProduce != null">project_produce = #{projectProduce},</if>
+            <if test="projectStartDateTime != null">project_start_date_time = #{projectStartDateTime}</if>
+        </trim>
+        where project_no = #{projectNo}
+    </update>
+
+    <update id="updateProjectUser">
+        update project_user set
+        <trim suffixOverrides=",">
+            <if test="userName != null">user_name = #{userName},</if>
+            <if test="userPhone != null">user_phone = #{userPhone},</if>
+        </trim>
+        where project_no = #{projectNo}
+    </update>
+
+    <update id="updateProjectType">
+        update project set project_type = #{type_name} where project_no = #{p_no}
+    </update>
+
+    <delete id="deleteProject">
+        delete p.*,up.*
+        from project p,user_project up
+        where p.project_no = up.project_no
+        and p.project_no = #{projectNo}
+    </delete>
+
+    <delete id="deleteProjectUser">
+        delete from project_user where project_no = #{projectNo}
+    </delete>
+
+    <delete id="deleteProjectPlan">
+        delete from project_plan where project_no = #{projectNo}
+    </delete>
+
+    <delete id="deletePlanGroup">
+        delete from project_group where project_no = #{projectNo}
+    </delete>
+
+    <delete id="deleteWork">
+        delete from project_work where project_no = #{projectNo}
+    </delete>
+
+    <delete id="deleteQuality">
+        delete from check_quality where project_no = #{projectNo}
+    </delete>
+
+    <update id="putToRecycle">
+        update project set p_stage = #{pStage} where project_no = #{projectNo}
+    </update>
+
+    <insert id="addProjectAccount">
+        insert into project_account(project_no,create_date_time,account_type,account_note,account_num,account_type_name,account_add_date_time)
+        values
+        (#{projectNo},#{createDateTime},#{accountType},#{accountNote},#{accountNum},#{typeName},#{startDateTime})
+    </insert>
+    
+    <resultMap id="getAccountData" type="cn.ux.jxxt.domain.custom.AccountWrap">
+        <result column="projectName" property="projectName"/>
+        <result column="projectMoney" property="projectMoney"/>
+        <result column="projectType" property="projectType"/>
+        <result column="projectNum" property="projectNum"/>
+        <result column="projectAuthorize" property="projectAuthorize"/>
+        <result column="userName" property="userName"/>
+        <result column="userPhone" property="userPhone"/>
+        <result column="projectStage" property="projectStage"/>
+        <result column="projectOutPut" property="projectOutPut"/>
+    </resultMap>
+
+    <select id="getProjectAccount" resultMap="getAccountData">
+        select p.project_name projectName, p.project_money projectMoney,p.project_type projectType,
+        p.project_num projectNum,p.project_authorize projectAuthorize,pu.user_name userName,
+        pu.user_phone userPhone,ps.name projectStage
+        from project p
+        left join project_user pu on p.project_no = pu.project_no
+        left join project_stage ps on ps.id = p.project_stage
+        where p.project_no = #{project_no}
+    </select>
+
+    <select id="getAccountNum" resultType="cn.ux.jxxt.domain.ProjectAccount">
+        select pa.id, pa.create_date_time createDateTime,pa.account_note accountNote,
+        pa.account_num accountNum,pa.account_type_name typeName,pa.account_type accountType,
+        pa.account_add_date_time startDateTime
+        from project_account pa
+        where project_no = #{project_no}
+    </select>
+
+    <select id="getOutPut" resultType="cn.ux.jxxt.domain.custom.OutPutWrap">
+        select co.project_ratio projectRatio,co.work_load workLoad
+        from check_output co
+        where project_no = #{project_no}
+    </select>
+
+    <select id="getProjectMoney" resultType="java.lang.Float">
+        select project.project_money from project where project_no = #{p_no}
+    </select>
+
+    <select id="getProjectAccountData" resultType="cn.ux.jxxt.domain.ProjectAccount">
+        select pa.account_type accountType,pa.account_num accountNum
+        from project_account pa
+        where project_no = #{project_no}
+    </select>
+
+    <select id="getProjectInfo" resultType="cn.ux.jxxt.domain.BusinessData">
+        select project_no projectNo,project_name projectName, project_charge projectBusiness,project_money projectMoney
+        from project
+        where project_charge = #{projectCharge}
+        <choose>
+            <when test="oneDate != null">
+                and project_create_date_time like '%${oneDate}%'
+            </when>
+            <when test="startDate != null and endDate != null">
+                and project_create_date_time between '${startDate}%' and '${endDate}%'
+            </when>
+        </choose>
+    </select>
+
+    <select id="getBusinessName" resultType="java.lang.String">
+        select distinct project_charge from project
+    </select>
+
+    <select id="getProjectReceipts" resultType="java.lang.Float">
+        select sum(account_num) projectMoney from project_account where account_type = 0 and project_no = #{projectNo}
+    </select>
+
+    <update id="updateProjectStage">
+        update project set project_stage = #{stageId} where project_no = #{projectNo}
+    </update>
+
+    <select id="getProjectWorkByNo" resultType="java.lang.String">
+        select project_work.project_no from project_work where project_no = #{projectNo}
+    </select>
+
+    <insert id="addProjectWork">
+        insert into project_work(project_no,project_stage) values (#{projectNo},0)
+    </insert>
+
+    <select id="getProjectQuality" resultType="java.lang.String">
+        select check_quality.project_no from check_quality where project_no = #{projectNo}
+    </select>
+
+    <insert id="addProjectQuality">
+        insert into check_quality(project_no) values (#{projectNo})
+    </insert>
+
+    <select id="getProjectPlan" resultType="java.lang.String">
+        select project_plan.project_no from project_plan where project_no = #{projectNo}
+    </select>
+
+    <insert id="addProjectPlan">
+        insert into project_plan(project_no) values (#{projectNo})
+    </insert>
+
+    <select id="getProjectRole" resultType="cn.ux.jxxt.domain.User">
+        select user.username from user LEFT JOIN user_role on user_role.user_id = `user`.id where user_role.role_id = #{roleId}
+    </select>
+
+    <select id="getProjectOutPut" resultMap="outPutDataRM">
+        select p.project_name projectName,p.project_type projectType,p.project_authorize projectAuthorize,p.project_note projectNote,p.project_produce projectProduce,
+        p.project_charge projectBusiness,p.project_start_date_time projectStartTime,pu.user_name projectUserName,p.examine_note examineNote,
+        pu.user_phone projectPhone,u.username projectSetup,project_plan.project_begun_date_time projectBegunDate,project_plan.execute_standard projectExe,
+        project_plan.work_note projectWorkNote,project_plan.project_output projectOutPut,project_plan.project_output_note projectOutPutNote,
+        project_plan.project_workload projectWorkLoad,
+        project_plan.work_require projectWorkRequire,project_plan.project_writer projectWriter,project_plan.project_charge projectCharge, fw.technical_disclosure_note disclosureNote,
+        fw.check_suggestion checkSuggestion,fw.data_name dataName,fw.brief_summary briefSummary,fw.work_load workLoad,
+        fw.finish_date_time projectEndTime,cq.final_check_suggestion qualitySuggestion,cq.quality_note qualityNote,cq.quality_score qualityScore,
+        ps.name projectStage,project_group.short_date_time shortDateTime,project_group.last_date_time lastDateTime,work_group.name workName
+        from project p
+        left join project_stage ps on ps.id = p.project_stage
+        left join project_plan on p.project_no = project_plan.project_no
+        left join project_user pu on pu.project_no = p.project_no
+        left join user_project on user_project.project_no = p.project_no
+        left join project_group on p.project_no = project_group.project_no
+        left join user u on user_project.user_id = u.id
+        left join project_work fw on p.project_no = fw.project_no
+        left join check_quality cq on p.project_no = cq.project_no
+        left join work_group on work_group.id = project_group.group_id
+        where p.project_no = #{projectNo} and project_group.group_id = #{groupId}
+    </select>
+
+    <select id="getProjectOutPutData" resultMap="outPutDataRM">
+        select p.project_name projectName,p.project_type projectType,p.project_authorize projectAuthorize,p.project_note projectNote,p.project_produce projectProduce,
+        p.project_charge projectBusiness,p.project_start_date_time projectStartTime,pu.user_name projectUserName,p.examine_note examineNote,
+        pu.user_phone projectPhone,u.username projectSetup,project_plan.project_begun_date_time projectBegunDate,project_plan.execute_standard projectExe,
+        project_plan.work_note projectWorkNote,project_plan.project_output projectOutPut,project_plan.project_output_note projectOutPutNote,
+        project_plan.project_workload projectWorkLoad,
+        project_plan.work_require projectWorkRequire,project_plan.project_writer projectWriter,project_plan.project_charge projectCharge, fw.technical_disclosure_note disclosureNote,
+        fw.check_suggestion checkSuggestion,fw.data_name dataName,fw.brief_summary briefSummary,fw.work_load workLoad,
+        fw.finish_date_time projectEndTime,cq.final_check_suggestion qualitySuggestion,cq.quality_note qualityNote,cq.quality_score qualityScore,
+        ps.name projectStage
+        from project p
+        left join project_stage ps on ps.id = p.project_stage
+        left join project_plan on p.project_no = project_plan.project_no
+        left join project_user pu on pu.project_no = p.project_no
+        left join user_project on user_project.project_no = p.project_no
+        left join user u on user_project.user_id = u.id
+        left join project_work fw on p.project_no = fw.project_no
+        left join check_quality cq on p.project_no = cq.project_no
+        where p.project_no = #{projectNo}
+    </select>
+
+    <select id="getOutPutList" resultType="cn.ux.jxxt.domain.custom.OutPutWrap">
+        select co.id, co.type_id typeId, co.project_ratio projectRatio, co.work_load workLoad from check_output co where project_no = #{projectNo}
+    </select>
+
+    <select id="getAllOutPutList" resultType="cn.ux.jxxt.domain.custom.OutPutWrap">
+        select co.type_id typeId,co.project_no projectNo,co.work_load workLoad,co.project_ratio projectRatio from check_output co
+        where co.project_no = #{projectNo} and co.group_id = #{groupId}
+    </select>
+
+    <select id="getAllOutPutType" resultType="cn.ux.jxxt.domain.custom.OutPutWrap">
+        select id, work_type.type_name typeName, work_type.unit typeUnit,work_type.unit_output typeOutput
+        from work_type
+    </select>
+
+    <select id="getAllGroupByProject" resultType="cn.ux.jxxt.domain.PlanRate">
+        select pg.project_no,pg.group_id,pg.output_rate,pg.short_date_time shortDate,pg.last_date_time lastDate,work_group.`name` groupName,
+        pg.project_output,pg.project_actually_output actuallyOutput
+        from project_group pg
+        left join work_group on work_group.id = pg.group_id
+        where pg.project_no = #{projectNo}
+    </select>
+
+    <select id="getProjectOutput" resultType="java.lang.String">
+        select check_output.project_no from check_output where project_no = #{projectNo}
+    </select>
+
+    <select id="getPrintWorkData" resultType="cn.ux.jxxt.domain.custom.ProjectOutPutWrap">
+        select short_date_time shortDateTime,last_date_time lastDateTime from project_group where project_no = #{projectNo} and group_id = #{groupId}
+    </select>
+
+    <insert id="addProjectOutput">
+        insert into check_output(project_no,project_ratio,work_load) values (#{projectNo},#{projectRatio},#{workLoad})
+    </insert>
+
+    <select id="getAccountInfo" resultMap="projectWrapRM">
+        select project.id,project.project_no projectNo,project.project_name projectName,project.project_authorize
+        projectAuthorize,project_stage projectStageId,
+        project.project_start_date_time projectStartTime,project.project_num projectNum,project.project_type projectType,
+        project_stage.name projectStage,
+        project.project_charge projectCharge,
+        user.username projectSetup,
+		project_user.user_name projectUserName,
+        project_user.user_phone projectUserPhone
+        from project
+        left join project_stage on project_stage.id = project.project_stage
+        left join user_project on project.project_no = user_project.project_no
+        left join user on user_project.user_id = user.id
+		left join project_user on project_user.project_no = project.project_no
+        left join project_plan on  project_plan.project_no=project.project_no
+        where project.project_no = #{projectNo}
+    </select>
+
+    <delete id="deleteAccount">
+        delete from project_account where id = #{accountId}
+    </delete>
+
+    <select id="getProjectsFromAccount" resultMap="projectWrapRM">
+        select project.id,project.project_no projectNo,project.project_name projectName,project.project_authorize
+        projectAuthorize,project_stage projectStageId,
+        project.project_start_date_time projectStartTime,project.project_charge projectSetUp,project.project_num
+        projectNum,project.project_type projectType,
+        project_stage.name projectStage,
+        project_plan.project_charge projectCharge,
+        user.username projectUser
+        from project
+        left join project_stage on project_stage.id = project.project_stage
+        left join user_project on project.project_no = user_project.project_no
+        left join user on user_project.user_id = user.id
+        left join project_plan on  project_plan.project_no=project.project_no
+        where project_plan.project_charge_account = #{userAccount}
+        <choose>
+            <when test="p_stage == 1">and p_stage = 1</when>
+            <otherwise>and p_stage = 2</otherwise>
+        </choose>
+        <if test="stageId != null">and project.project_stage = #{stageId}</if>
+        <if test="startDate != null">
+            and project.project_start_date_time between '${startDate}' and '${endDate}'
+        </if>
+
+        <if test="search != null">and (project.project_no like '%${search}%'
+            or project.project_name like '%${search}%'
+            or project.project_num like '%${search}%'
+            or project.project_type like '%${search}%')
+        </if>
+        order by ${sortBy}
+        <choose>
+            <when test="desc == true">desc</when>
+            <otherwise>asc</otherwise>
+        </choose>
+        limit #{offset},#{per_page}
+    </select>
+
+    <resultMap id="getSchedule" type="cn.ux.jxxt.domain.ProjectSchedule">
+        <id column="id" property="id" />
+        <result column="project_no" property="projectNo" />
+        <result column="project_create_time" property="projectCreateTime"/>
+        <result column="project_name" property="projectName"/>
+        <result column="project_rate" property="projectRate"/>
+        <result column="project_note" property="projectNote" />
+        <result column="project_actually_finish_date" property="projectActuallyFinishDate"/>
+        <result column="projectActuallyFinishNum" property="projectActuallyFinishNum" />
+        <result column="project_work_date" property="projectWorkDate"  />
+        <result column="project_quality_date" property="projectQualityDate"  />
+        <result column="qualityDateTime" property="qFinishDateTime"/>
+        <result column="workDateTime" property="wFinishDateTime" />
+        <result column="projectBegunDate" property="projectBegunDate" />
+        <result column="contractNo" property="contractNo" />
+    </resultMap>
+
+    <select id="getScheduleByNo" resultMap="getSchedule">
+        select * from project_schedule where project_no = #{projectNo} and group_id = #{groupId}
+    </select>
+
+    <select id="getWorkSchedule" resultMap="getSchedule">
+        select a.*,project.project_name projectName
+        from project_schedule a
+        left join project on a.project_no = project.project_no
+        where a.project_no = #{projectNo} and not exists (select * from project_schedule b where a.project_no = b.project_no and a.project_create_time &lt; project_create_time )
+    </select>
+
+    <insert id="addSchedule" parameterType="cn.ux.jxxt.domain.ProjectSchedule">
+        insert into project_schedule(project_no,project_create_time,project_name,project_rate,project_note,project_actually_finish_date,group_id)
+        values(#{projectNo},#{projectCreateTime},#{projectName},#{projectRate},#{projectNote},#{projectActuallyFinishDate},#{groupId})
+    </insert>
+
+    <update id="updateSchedule" parameterType="cn.ux.jxxt.domain.ProjectSchedule">
+        update project_schedule set
+        <trim suffixOverrides=",">
+            <if test="projectNo != null">project_no = #{projectNo},</if>
+            <if test="projectRate > 0">project_rate = #{projectRate},</if>
+            <if test="projectNote != null">project_note = #{projectNote},</if>
+            <if test="projectActuallyFinishDate != null">project_actually_finish_date = #{projectActuallyFinishDate}</if>
+        </trim>
+        where project_no = #{projectNo}
+    </update>
+
+    <delete id="deleteSchedule">
+        delete from project_schedule where id = #{scheduleId}
+    </delete>
+
+    <select id="getScheduleById" resultMap="getSchedule">
+        select * from project_schedule where id = #{scheduleId}
+    </select>
+
+    <select id="getProjectUserBycNo" resultMap="projectUserRM">
+        select * from project_user where contract_no = #{contractNo}
+    </select>
+
+    <select id="getUserByProjectNo" resultType="java.lang.String">
+        select project_no from user_project where project_no = #{projectNo}
+    </select>
+
+    <resultMap id="QualityBack" type="cn.ux.jxxt.domain.BackWork">
+        <id column="id" property="id"/>
+        <result column="back_note" property="backNote"/>
+        <result column="project_no" property="projectNo"/>
+        <result column="back_create_time" property="backCreatedTime"/>
+        <result column="submit_create_time" property="submitCreatedTime"/>
+        <result column="back_stage" property="backStage"/>
+        <result column="group_id" property="groupId"/>
+    </resultMap>
+
+    <update id="updateWorkBackStage">
+        update project_work set back_stage = #{id} where project_no = #{projectNo}
+    </update>
+
+    <update id="updatectuallyFinishNum">
+        UPDATE project set project_actually_finish_num = #{projectActuallyFinishNum} where project_no = #{projectNo}
+    </update>
+
+    <insert id="addBackData" parameterType="cn.ux.jxxt.domain.BackWork">
+        insert into back_work(back_note,project_no,back_create_time,submit_create_time,back_stage)
+        values (#{backNote},#{projectNo},#{backCreatedTime},#{submitCreatedTime},#{backStage})
+    </insert>
+
+    <select id="getBackData" resultMap="QualityBack">
+        select back_work.*,edit_note.note from back_work
+        left join edit_note on back_work.id = edit_note.back_id
+        where project_no = #{projectNo}
+    </select>
+
+    <insert id="addNote" parameterType="cn.ux.jxxt.domain.EditeNote">
+        insert into edit_note(back_id,note)
+        values (#{back_id},#{note})
+    </insert>
+
+    <select id="getBackDataById" resultMap="QualityBack">
+        select * from back_work where project_no = #{projectNo} and id = #{id}
+    </select>
+
+    <select id="getWorkBackId" resultType="java.lang.String">
+        select back_stage from project_work where project_no = #{projectNo}
+    </select>
+
+    <update id="updateBackData" parameterType="cn.ux.jxxt.domain.BackWork">
+        update back_work set
+        <trim suffixOverrides=",">
+            <if test="backNote != null">back_note = #{backNote},</if>
+            <if test="projectNo != null">project_no = #{projectNo},</if>
+            <if test="backCreatedTime != null">back_create_time = #{backCreatedTime},</if>
+            <if test="submitCreatedTime != null">submit_create_time = #{submitCreatedTime},</if>
+            <if test="backDateNum != null">back_date_num = #{backDateNum},</if>
+            <if test="backStage != null">back_stage = #{backStage}</if>
+        </trim>
+        where project_no = #{projectNo} and id = #{id}
+    </update>
+
+    <!--<select id="getScheduleDatalist" resultMap="getSchedule">-->
+        <!--select a.*, project_plan.project_work_date,project_plan.project_quality_date,-->
+        <!--project_plan.project_begun_date_time projectBegunDate,-->
+        <!--project_work.finish_date_time workDateTime,check_quality.finish_date_time qualityDateTime,-->
+        <!--project.project_stage,project.project_actually_finish_num projectActuallyFinishNum,-->
+        <!--contract_project.contract_no contractNo-->
+
+        <!--from project_schedule a-->
+        <!--left join project_plan on project_plan.project_no = a.project_no-->
+        <!--left join project_work on project_work.project_no = a.project_no-->
+        <!--left join check_quality on check_quality.project_no = a.project_no-->
+        <!--left join project on project.project_no = a.project_no-->
+        <!--left join contract_project on contract_project.project_no = a.project_no-->
+        <!--where not exists (select * from project_schedule b where a.project_no = b.project_no and a.project_create_time &lt; project_create_time )-->
+          <!--and (project.project_stage BETWEEN 3 and 6)-->
+        <!--<if test="userAccount != null"> and project.project_charge_account = #{userAccount}</if>-->
+
+        <!--<choose>-->
+            <!--<when test="startDate != null">and a.project_create_time between '${startDate}' and '${endDate}' </when>-->
+            <!--<otherwise>and a.project_create_time >= CONCAT(date_format(date_add(NOW(), interval -1 MONTH) ,'%Y-%m') ,'-01') </otherwise>-->
+        <!--</choose>-->
+
+        <!--<if test="search != null">and (a.project_no like '%${search}%'-->
+            <!--or a.project_note like '%${search}%'-->
+            <!--or a.project_name like '%${search}%')-->
+        <!--</if>-->
+        <!--order by ${sortBy}-->
+        <!--<choose>-->
+            <!--<when test="desc == true">desc</when>-->
+            <!--<otherwise>asc</otherwise>-->
+        <!--</choose>-->
+        <!--limit #{offset},#{per_page}-->
+    <!--</select>-->
+
+    <select id="getScheduleDatalist" resultType="cn.ux.jxxt.domain.ProjectSchedule">
+        select a.id id,a.project_no projectNo,a.project_create_time projectCreateTime,
+        a.project_name projectName,a.project_rate projectRate,a.project_note projectNote,
+        a.project_actually_finish_date projectActuallyFinishDate,
+        project_plan.project_work_date projectWorkDate,project_plan.project_quality_date projectQualityDate,
+        project_plan.project_begun_date_time projectBegunDate,
+        project_work.finish_date_time wFinishDateTime,check_quality.finish_date_time qFinishDateTime,
+        project.project_actually_finish_num projectActuallyFinishNum,
+        contract_project.contract_no contractNo
+
+        from project_schedule a
+        left join project_plan on project_plan.project_no = a.project_no
+        left join project_work on project_work.project_no = a.project_no
+        left join check_quality on check_quality.project_no = a.project_no
+        left join project on project.project_no = a.project_no
+        left join contract_project on contract_project.project_no = a.project_no
+        where not exists (select * from project_schedule b where a.project_no = b.project_no and a.project_create_time &lt; project_create_time )
+        and (project.project_stage BETWEEN 3 and 6)
+        <if test="userAccount != null"> and project.project_charge_account = #{userAccount}</if>
+
+        <choose>
+            <when test="startDate != null">and a.project_create_time between '${startDate}' and '${endDate}' </when>
+            <otherwise>and a.project_create_time >= CONCAT(date_format(date_add(NOW(), interval -1 MONTH) ,'%Y-%m') ,'-01') </otherwise>
+        </choose>
+
+        <if test="search != null">and (a.project_no like '%${search}%'
+            or a.project_note like '%${search}%'
+            or a.project_name like '%${search}%')
+        </if>
+        order by ${sortBy}
+        <choose>
+            <when test="desc == true">desc</when>
+            <otherwise>asc</otherwise>
+        </choose>
+        limit #{offset},#{per_page}
+    </select>
+
+    <select id="getScheduleDataCount" resultType="java.lang.Long">
+        select count(*)
+        from project_schedule a
+        left join project_plan on project_plan.project_no = a.project_no
+        left join project_work on project_work.project_no = a.project_no
+        left join check_quality on check_quality.project_no = a.project_no
+        left join project on project.project_no = a.project_no
+        left join contract_project on contract_project.project_no = a.project_no
+        where not exists (select * from project_schedule b where a.project_no = b.project_no and a.project_create_time &lt; project_create_time )
+        and (project.project_stage BETWEEN 3 and 6)
+        <if test="userAccount != null"> and project.project_charge_account = #{userAccount}</if>
+        <choose>
+            <when test="startDate != null">and a.project_create_time between '${startDate}' and '${endDate}' </when>
+            <otherwise>and a.project_create_time >= CONCAT(date_format(date_add(NOW(), interval -1 MONTH) ,'%Y-%m') ,'-01') </otherwise>
+        </choose>
+
+        <if test="search != null">and (a.project_no like '%${search}%'
+            or a.project_note like '%${search}%'
+            or a.project_name like '%${search}%')
+        </if>
+    </select>
+
+    <select id="getBackNum" resultType="java.lang.Long">
+        select sum(back_date_num) projectNum from back_work where project_no = #{projectNo}
+    </select>
+
+    <select id="getScheduleProjectCount" resultType="java.lang.Long">
+        select count(*) from project where project_stage = 4 or project_stage = 3
+    </select>
+
+    <select id="getProjectDataCoe" resultType="cn.ux.jxxt.domain.ProjectCoe">
+        SELECT p.project_no,p.project_name,p.project_start_date_time,p.project_stage,p.p_stage,
+        ps.project_rate,pp.project_output, pp.project_actually_output
+        from project p
+        LEFT JOIN (SELECT project_no, project_rate, max(project_create_time) from project_schedule group by project_no,project_rate) ps on p.project_no = ps.project_no
+        LEFT JOIN project_work pw on p.project_no = pw.project_no
+        LEFT JOIN project_plan pp on p.project_no = pp.project_no
+
+        WHERE 1=1  and p.p_stage = 1
+        and ( (ps.project_rate BETWEEN 0 and 99 and p.project_start_date_time &lt; DATE_ADD(curdate(),interval -day(curdate())+1 day))
+        or p.project_start_date_time >= DATE_ADD(curdate(),interval -day(curdate())+1 day) )
+        and p.project_stage BETWEEN 2 and 6
+        and pw.project_stage = 0
+        ORDER BY p.project_start_date_time DESC
+    </select>
+
+    <select id="getProjectNoByThisMonth" resultType="cn.ux.jxxt.domain.OutPutData">
+      select project.project_no projectNo,project.project_name projectName,project_plan.project_output projectOutPut,project_plan.project_charge groupHeadMan from project
+      left join project_plan on project_plan.project_no = project.project_no
+	  left join project_work on project_work.project_no = project.project_no
+      where DATE_FORMAT(plan_work_date,'%Y%m')=DATE_FORMAT(CURDATE(),'%Y%m')
+      and p_stage = 1 and project_work.project_stage = 0
+    </select>
+
+    <select id="getProjectNoBeforeMonth" resultType="cn.ux.jxxt.domain.OutPutData">
+      select project.project_no projectNo,project.project_name projectName,project_plan.project_output projectOutPut,project_plan.project_charge groupHeadMan from project
+      left join project_plan on project_plan.project_no = project.project_no
+        left join project_work on project_work.project_no = project.project_no
+        where project_work.plan_work_date &lt; (
+        select date_sub(date_sub(date_format(now(),'%y-%m-%d'),interval extract( day from now()) day),interval 0 month) as date)
+        and (project.project_stage = 3 or project.project_stage = 4) and project_work.project_stage = 0
+    </select>
+
+    <select id="getProjectAtWorkNoStop" resultType="cn.ux.jxxt.domain.OutPutData">
+       select project.project_no projectNo,project.project_name projectName,project_plan.project_output projectOutPut,project_plan.project_charge groupHeadMan from project
+       left join project_plan on project_plan.project_no = project.project_no
+       left join project_work on project_work.project_no = project.project_no
+       where project.project_stage = 3 and project_work.project_stage = 0
+    </select>
+
+    <select id="getProjectRate" resultType="cn.ux.jxxt.domain.PlanRate">
+        select pg.group_id,pg.project_no,p.project_name projectName,pg.output_rate,pg.project_output,pg.project_actually_output actuallyOutput
+        from project_group pg left join project p on  p.project_no = pg.project_no where pg.project_no = #{projectNo}
+    </select>
+
+    <select id="getWorkGroup" resultType="cn.ux.jxxt.domain.WorkGroup">
+        select w.id, w.name gName, w.head_man headMan from work_group w order by f_id asc
+    </select>
+
+    <select id="getProjectByThisMonth" resultType="java.lang.String">
+        select  project.project_no projectNo from project
+        left join project_plan on project_plan.project_no = project.project_no
+        left join project_work on project_work.project_no = project.project_no
+        where (project.project_stage = 3 or project.project_stage = 4) and project_work.project_stage = 0 and project.p_stage = 1
+    </select>
+
+    <select id="getProjectScheduleByWork" resultType="cn.ux.jxxt.domain.OutPutData">
+       select project_schedule.project_no projectNo,project_schedule.project_rate projectRate,project_group.group_id groupId from project
+        left join project_schedule on project_schedule.project_no = project.project_no
+        left join project_group on project_group.project_no = project.project_no
+        where project_schedule.project_no = #{projectNo}
+        and project_schedule.project_rate &lt;= 90
+    </select>
+
+    <select id="getProjectNoByWork" resultType="cn.ux.jxxt.domain.OutPutData">
+        select project.project_no projectNo from project
+        left join project_plan on project_plan.project_no = project.project_no
+        left join project_work on project_work.project_no = project.project_no
+        where project.project_stage = 3 and project.p_stage = 1 and project_work.project_stage = 0
+    </select>
+
+    <select id="getProjectOnQuality" resultType="cn.ux.jxxt.domain.OutPutData">
+        select project.project_no projectNo from project
+        left join project_plan on project_plan.project_no = project.project_no
+        left join project_work on project_work.project_no = project.project_no
+        where project.project_stage = 4 and project.p_stage = 1
+    </select>
+
+    <select id="getWorkBackOnly" resultType="java.lang.String">
+        SELECT DISTINCT back_work.project_no FROM back_work
+        left join project on back_work.project_no = project.project_no
+        where project.project_stage = #{stageId}
+    </select>
+
+    <select id="getProjectWorks" resultMap="projectWrapRM">
+        select project.id,project.project_no projectNo,project.project_name projectName,project.project_authorize
+        projectAuthorize,project_stage projectStageId,project.project_produce projectProduce,
+        project.project_start_date_time projectStartTime,project.project_charge projectSetUp,project.project_num
+        projectNum,project.project_type projectType,
+        project_stage.name projectStage,
+        project_plan.project_charge projectCharge,
+        project_contract.contract_note contractNote,
+        project_contract.contract_business contractBusiness,project_contract.contract_money contractMoney,
+        project_user.user_name projectUserName,project_user.user_phone projectUserPhone,
+        user.username projectUser
+        from project
+        left join project_stage on project_stage.id = project.project_stage
+        left join user_project on project.project_no = user_project.project_no
+        left join user on user_project.user_id = user.id
+        left join project_plan on  project_plan.project_no=project.project_no
+        left join contract_project on  project.project_no=contract_project.project_no
+        left join project_user on contract_project.contract_no = project_user.contract_no
+        left join project_contract on project_user.contract_no = project_contract.contract_no
+        where project.project_no = #{projectNo}
+        <choose>
+            <when test="p_stage == 1">and p_stage = 1</when>
+            <otherwise>where p_stage = 2</otherwise>
+        </choose>
+        <if test="stageId != null">and project.project_stage = #{stageId}</if>
+        <if test="startDate != null">
+            and project.project_start_date_time between '${startDate}' and '${endDate}'
+        </if>
+
+        <if test="search != null">and (project.project_no like '%${search}%'
+            or project.project_name like '%${search}%'
+            or project.project_num like '%${search}%'
+            or project.project_type like '%${search}%')
+        </if>
+        order by ${sortBy}
+        <choose>
+            <when test="desc == true">desc</when>
+            <otherwise>asc</otherwise>
+        </choose>
+        limit #{offset},#{per_page}
+    </select>
+
+    <delete id="deleteContractToProject">
+        delete from contract_project where project_no = #{projectNo}
+    </delete>
+
+    <select id="getProjectChargeGroup" resultType="java.lang.Long">
+        select user_group.group_id
+        from user_group
+        left join user on user.id = user_group.user_id
+        left join project_plan on project_plan.project_charge = user.username
+        where user.username = #{chargeAccount}
+    </select>
+
+    <update id="updateActuallyOutPut">
+        update project_group set project_actually_output = #{actuallyOutPut}
+        where project_group.project_no = #{projectNo} and project_group.group_id = #{groupId}
+    </update>
+
+    <update id="updatePlanOutput">
+        update project_plan set project_actually_output = #{actuallyOutPut} where project_no = #{projectNo}
+    </update>
+
+    <select id="getProjectOutPutCount" resultType="java.lang.Long">
+        select count(*) from project_group
+    </select>
+
+    <select id="getPOutPut" resultMap="projectWrapRM">
+        select project_group.id,project.project_name projectName,project_group.project_no projectNo,
+        project_group.project_output projectOutPut,project_group.project_actually_output projectActuallyOutput,
+        work_group.name workName,project.project_start_date_time projectStartTime,contract_project.contract_no contractNo
+        from project_group
+        left join project on project.project_no = project_group.project_no
+        left join contract_project on contract_project.project_no = project.project_no
+        left join work_group on project_group.group_id = work_group.id
+        where p_stage = 1
+        <choose>
+            <when test="startDate != null">
+                and project.project_start_date_time between '${startDate}' and '${endDate}'
+            </when>
+            <otherwise>and DATE_FORMAT(project.project_start_date_time,'%Y %m') = date_format(DATE_SUB(curdate(), INTERVAL 0 MONTH),'%Y %m')</otherwise>
+
+        </choose>
+
+        <if test="search != null">and (project.project_no like '%${search}%'
+            or project.project_name like '%${search}%'
+            or project.project_num like '%${search}%'
+            or project.project_type like '%${search}%')
+        </if>
+        <if test="userAccount != null">and project_group.group_id = #{groupId}</if>
+        order by ${sortBy}
+        <choose>
+            <when test="desc == true">desc</when>
+            <otherwise>asc</otherwise>
+        </choose>
+
+    </select>
+
+    <select id="getScheduleNoteByNo" resultType="cn.ux.jxxt.domain.ProjectSchedule">
+        select id,project_create_time projectCreateTime,project_rate projectRate,project_note projectNote from project_schedule where project_no = #{projectNo}
+    </select>
+
+    <update id="updateContractFile">
+        update contract_file set fileName = #{projectFile} where contract_no = #{contractNo}
+    </update>
+
+    <select id="getContractFileName" resultType="java.lang.String">
+        select contract_file.fileName from contract_file where contract_no = #{contractNo}
+    </select>
+
+    <select id="getContractByNo" resultType="cn.ux.jxxt.domain.ContractData">
+        select contract_file.fileName contractName from contract_file where contract_no = #{contractNo}
+    </select>
+
+    <insert id="addContractByNo">
+        insert into contract_file(contract_no,fileName) values (#{contractNo},#{fileName})
+    </insert>
+
+    <select id="getProjectGroupId" resultType="java.lang.String">
+        select user_group.group_id
+        from project p
+        left join user u on u.useraccount = p.project_charge_account
+        left join user_group on user_group.user_id = u.id
+        where p.project_no = #{projectNo}
+    </select>
+
+    <select id="getProjectGroup" resultType="cn.ux.jxxt.domain.WorkGroup">
+        select w.id,w.name gName
+        from project_group p
+        left join work_group w on p.group_id = w.id
+        where p.project_no = #{projectNo}
+    </select>
+
+    <update id="updateoutput">
+        UPDATE project_plan set project_output = #{projectOutPut} where project_no = #{projectNo}
+    </update>
+
+    <select id="getUserIdByUserName" resultType="java.lang.Long">
+        select `user`.id from user where `user`.username = #{userName}
+    </select>
+
+    <select id="getProjectNoByGroup" resultType="cn.ux.jxxt.dto.ProjectPlanDTO">
+        select project_no pNo,project_output outpu from p_group_user where project_id = #{id}
+    </select>
+
+    <update id="updatePOUtput">
+        update project_plan set project_output = #{output},project_actually_output = #{output} where project_no = #{projectNo}
+    </update>
+
+    <update id="addProjectMoney">
+        update project set project_money = #{money} where project_no = #{projectNo}
+    </update>
+
+    <update id="updateRateOfsc">
+        update project_schedule set project_rate = 100 where project_no = #{projectNo} and project_rate = 90
+    </update>
+
+    <select id="getProjectNoByContractNo" resultType="java.lang.String">
+        select contract_project.project_no from contract_project where contract_no = #{contractNo}
+    </select>
+
+    <select id="getGroupIdByAccount" resultType="java.lang.Long">
+        select user_group.group_id from user_group
+        left join user on user_group.user_id = `user`.id
+        where `user`.useraccount = #{userAccount}
+    </select>
+
+    <update id="updatePlanWorkDate">
+        update project_work set plan_work_date = #{planWorkDate} where project_no = #{projectNo}
+    </update>
+
+    <select id="getPlanWorkDate" resultType="java.lang.String">
+        select plan_work_date from project_work where project_no = #{projectNo}
+    </select>
+</mapper>

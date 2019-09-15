@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.ux.jxxt.dao.ProjectTypeDao">
+    <resultMap id="projectTypeRM" type="cn.ux.jxxt.domain.ProjectType">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+    </resultMap>
+
+    <insert id="insertType" parameterType="cn.ux.jxxt.domain.ProjectType">
+        insert into project_type(name)
+        values
+        (#{name})
+    </insert>
+
+    <select id="queryType" resultMap="projectTypeRM">
+        select * from project_type
+    </select>
+
+    <update id="updateType" parameterType="cn.ux.jxxt.domain.ProjectType">
+        update project_type set name=#{name}
+        where id=#{id}
+    </update>
+
+    <select id="queryTypeById" parameterType="java.lang.Long" resultMap="projectTypeRM">
+        select * from project_type where id=#{typeId}
+    </select>
+
+    <select id="queryTypeByName" parameterType="java.lang.String" resultMap="projectTypeRM">
+        select * from project_type where name=#{typeName}
+    </select>
+
+    <delete id="deleteById">
+        delete from project_type where id=#{typeId}
+    </delete>
+
+
+    <delete id="deleteByName">
+        delete from project_type where name=#{typeName}
+    </delete>
+
+    <select id="getTypeNum" resultType="java.lang.Long">
+        select count(id) from project_type
+    </select>
+
+    <select id="queryTypesPaginated" resultMap="projectTypeRM">
+        select * from project_type
+        order by
+        ${sortBy}
+        <choose>
+            <when test="desc == true">desc</when>
+            <otherwise>asc</otherwise>
+        </choose>
+        limit #{offset},#{per_page}
+    </select>
+</mapper>

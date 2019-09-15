@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.ux.jxxt.dao.ProjectWorkDao">
+    <resultMap id="projectWorkRM" type="cn.ux.jxxt.domain.ProjectWork">
+        <id column="id" property="id"/>
+        <result column="technical_disclosure_note" property="disclosureNote"/>
+        <result column="check_suggestion" property="checkSuggestion"/>
+        <result column="data_name" property="dataName"/>
+        <result column="brief_summary" property="briefSummary"/>
+        <result column="work_load" property="workLoad"/>
+        <result column="project_no" property="projectNo"/>
+        <result column="finish_date_time" property="finishDateTime"/>
+        <result column="projectSetUp" property="projectSetUp"/>
+        <result column="projectBusiness" property="projectBusiness"/>
+        <result column="projectProduce" property="projectProduce"/>
+        <result column="projectName" property="projectName"/>
+        <result column="projectType" property="projectType"/>
+        <result column="projectStartTime" property="projectStartTime"/>
+        <result column="project_rate" property="projectRate"/>
+        <result column="projectBegunDate" property="projectBegunDate"/>
+        <collection property="projectPlan" ofType="cn.ux.jxxt.domain.ProjectPlan"
+                    column="project_no" select="getPlanData"/>
+    </resultMap>
+
+    <update id="addFinishDateTime">
+        update project_work set finish_date_time = #{finishDateTime} where project_no = #{projectNo}
+    </update>
+
+    <select id="getFinishDateTime" resultType="java.lang.String">
+        select project_work.finish_date_time from project_work where project_no = #{projectNo}
+    </select>
+
+    <insert id="addProjectWork" parameterType="cn.ux.jxxt.domain.ProjectWork">
+        insert into project_work(technical_disclosure_note,check_suggestion,data_name,
+        brief_summary,work_load,project_no,project_stage)
+        values
+        (#{disclosureNote},#{checkSuggestion},#{dataName},#{briefSummary},
+        #{workLoad},#{projectNo},0)
+    </insert>
+
+    <update id="updateWork">
+        update project_work set
+        <trim suffixOverrides=",">
+            <if test="disclosureNote != null">technical_disclosure_note = #{disclosureNote},</if>
+            <if test="checkSuggestion != null">check_suggestion = #{checkSuggestion},</if>
+            <if test="dataName != null">data_name = #{dataName},</if>
+            <if test="finishDateTime != null">finish_date_time = #{finishDateTime},</if>
+            <if test="briefSummary != null">brief_summary = #{briefSummary},</if>
+            <if test="workLoad != null">work_load = #{workLoad},</if>
+            <if test="projectStage != null">project_stage = #{projectStage}</if>
+        </trim>
+        where project_no = #{projectNo}
+    </update>
+
+    <select id="getWorkData" resultMap="projectWorkRM">
+      select fw.*,project.project_charge projectBusiness,project.project_produce projectProduce,
+      project.project_name projectName,project.project_type projectType,
+      project_plan.project_begun_date_time projectBegunDate,
+      project.project_start_date_time projectStartTime,
+      user.username projectSetUp from project_work fw
+      left join project on project.project_no = fw.project_no
+	  left join user_project on user_project.project_no = fw.project_no
+	  left join project_plan on project.project_no = project_plan.project_no
+	  left join user on user_project.user_id = user.id
+	  where fw.project_no = #{project_no}
+    </select>
+
+    <select id="getPlanData" resultType="cn.ux.jxxt.domain.ProjectPlan">
+      select project_plan.id,project_plan.execute_standard projectExecuteStandard,project_plan.work_note projectWorkNote,
+      project_plan.work_require projectWorkRequire,project_plan.project_writer projectWriter,project_plan.project_charge projectCharge,
+      project.project_type projectType,project.project_authorize projectAuthorize,
+      project.project_num projectNum,project_user.user_name userName,project.project_note projectNote,
+      project_user.user_phone userPhone
+      from project_plan
+	  left join project on project.project_no = project_plan.project_no
+	  left join user_project on user_project.project_no = project_plan.project_no
+	  left join user on user_project.user_id = user.id
+      left join project_user on project_user.project_no = project_plan.project_no
+      where project_plan.project_no = #{project_no}
+    </select>
+</mapper>

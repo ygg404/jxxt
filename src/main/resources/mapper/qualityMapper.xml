@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.ux.jxxt.dao.CheckQualityDao">
+    <resultMap id="qualityRM" type="cn.ux.jxxt.domain.CheckQuality">
+        <id column="id" property="id"/>
+        <result column="final_check_suggestion" property="checkSuggestion"/>
+        <result column="quality_note" property="qualityNote"/>
+        <result column="quality_score" property="qualityScore"/>
+        <result column="project_no" property="projectNo"/>
+        <result column="project_examine_note" property="projectExamineNote"/>
+        <result column="groupId" property="groupId"/>
+    </resultMap>
+
+    <insert id="addQualityData" parameterType="cn.ux.jxxt.domain.CheckQuality">
+        insert into check_quality(final_check_suggestion,quality_note,quality_score,project_no)
+        values
+        (#{checkSuggestion},#{qualityNote},#{qualityScore},#{projectNo})
+    </insert>
+
+    <update id="updateQuality">
+        update check_quality set
+        <trim suffixOverrides=",">
+            <if test="checkSuggestion != null">final_check_suggestion = #{checkSuggestion},</if>
+            <if test="qualityNote != null">quality_note = #{qualityNote},</if>
+            <if test="qualityScore != null">quality_score = #{qualityScore}</if>
+        </trim>
+        where project_no = #{projectNo}
+    </update>
+
+    <select id="getQualityAccount" resultType="java.lang.String">
+        select quality_useraccount from check_quality where project_no = #{projectNo}
+    </select>
+
+    <update id="updateQualityFromQuser">
+        update check_quality set quality_useraccount = #{userAccount} where project_no = #{projectNo}
+    </update>
+
+    <update id="updateQualityFromUser">
+        update check_quality set quality_confirmaccount = #{userAccount} where project_no = #{projectNo}
+    </update>
+
+    <select id="getQualityData" resultMap="qualityRM">
+        select cq.final_check_suggestion,cq.quality_note,cq.quality_score,cq.project_no,
+        project.examine_note project_examine_note
+        from check_quality cq
+        left join project on project.project_no = cq.project_no
+        where cq.project_no = #{project_no}
+    </select>
+
+    <select id="getPlanData" resultType="cn.ux.jxxt.domain.ProjectPlan">
+      select project_plan.id,project_plan.execute_standard projectExecuteStandard,project_plan.work_note projectWorkNote,
+      project_plan.work_require projectWorkRequire,project_plan.project_writer projectWriter,project_plan.project_charge projectCharge,
+      project.project_type projectType,project_name projectName,project.project_authorize projectAuthorize,project.project_note projectNote,
+      project.project_num projectNum,project_user.user_name userName,project_user.user_phone userPhone,user.username projectSetUp
+      from project_plan
+	  left join project on project.project_no = project_plan.project_no
+	  left join user_project on user_project.project_no = project_plan.project_no
+	  left join user on user_project.user_id = user.id
+      left join project_user on project_user.project_no = project_plan.project_no
+      where project_plan.project_no = #{projectNo}
+    </select>
+
+    <select id="getWorkData" resultType="cn.ux.jxxt.domain.ProjectWork">
+      select fw.technical_disclosure_note disclosureNote,fw.check_suggestion checkSuggestion,fw.data_name dataName,
+      fw.brief_summary briefSummary,fw.work_load workLoad,fw.finish_date_time finishDateTime,
+      project.project_charge projectBusiness,project.project_produce projectProduce,project.project_type projectType,
+      project.project_start_date_time projectStartTime,
+      user.username projectSetUp from project_work fw
+      left join project on project.project_no = fw.project_no
+	  left join user_project on user_project.project_no = fw.project_no
+	  left join user on user_project.user_id = user.id
+	  where fw.project_no = #{projectNo}
+    </select>
+
+    <select id="getOutPutData" resultType="cn.ux.jxxt.domain.custom.OutPutWrap">
+        select co.type_id typeId,co.project_ratio projectRatio,co.work_load workLoad
+        from check_output co
+        where co.project_no = #{project_no}
+    </select>
+
+    <resultMap id="QualityResultRM" type="cn.ux.jxxt.domain.QualityScore">
+        <id column="id" property="id"/>
+        <result column="type_id" property="type_id"/>
+        <result column="check_result" property="check_result"/>
+        <result column="check_type" property="check_type"/>
+        <result column="check_a" property="check_a"/>
+        <result column="check_b" property="check_b"/>
+        <result column="check_c" property="check_c"/>
+        <result column="check_d" property="check_d"/>
+        <result column="project_no" property="project_no"/>
+    </resultMap>
+
+    <select id="getQualityScore" resultMap="QualityResultRM">
+        select * from quality_score where project_no = #{projectNo}
+    </select>
+
+    <select id="getQualityScoreByTypeId" resultMap="QualityResultRM">
+        select * from quality_score where project_no = #{projectNo} and type_id = #{type_id}
+    </select>
+
+    <insert id="addQualityScore" parameterType="cn.ux.jxxt.domain.QualityScore">
+        insert into quality_score(type_id,check_result,check_type,check_a,check_b,check_c,check_d,project_no)
+        values(#{type_id},#{check_result},#{check_type},#{check_a},#{check_b},#{check_c},#{check_d},#{project_no})
+    </insert>
+
+    <update id="updateQualityScore" parameterType="cn.ux.jxxt.domain.QualityScore">
+        update quality_score set
+        <trim suffixOverrides=",">
+            <if test="check_result != null">check_result = #{check_result},</if>
+            <if test="check_type != null">check_type = #{check_type},</if>
+            <if test="check_a != null">check_a = #{check_a},</if>
+            <if test="check_b != null">check_b = #{check_b},</if>
+            <if test="check_c != null">check_c = #{check_c},</if>
+            <if test="check_d != null">check_d = #{check_d}</if>
+        </trim>
+        where project_no = #{projectNo} and type_id = #{type_id}
+    </update>
+
+    <update id="addFinishDateTime">
+        update check_quality set finish_date_time = #{finishDateTime} where project_no = #{projectNo}
+    </update>
+
+    <select id="getFinishDateTime" resultType="java.lang.String">
+        select check_quality.finish_date_time from check_quality where project_no = #{projectNo}
+    </select>
+</mapper>

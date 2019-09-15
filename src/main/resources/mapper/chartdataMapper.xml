@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.ux.jxxt.dao.ChartDataDao">
+    <resultMap id="chartDataRM" type="cn.ux.jxxt.domain.ChartData">
+        <id column="id" property="id"/>
+        <result column="project_no" property="projectNo"/>
+        <result column="project_name" property="projectName"/>
+        <result column="project_authorize" property="projectAuthorize"/>
+        <result column="project_user_name" property="userName"/>
+        <result column="project_user_phone" property="userPhone"/>
+        <result column="project_receivable" property="projectReceivable"/>
+        <result column="project_money" property="projectMoney"/>
+        <result column="project_charge" property="projectCharge"/>
+    </resultMap>
+
+    <resultMap id="planRateRM" type="cn.ux.jxxt.domain.PlanRate">
+        <id column="id" property="id"/>
+        <result column="project_no" property="project_no"/>
+        <result column="group_id" property="group_id"/>
+        <result column="output_rate" property="output_rate"/>
+        <result column="project_name" property="projectName"/>
+        <result column="project_type" property="projectType"/>
+        <result column="finish_date_time" property="finishDateTime"/>
+        <result column="quality_score" property="quality_score"/>
+        <result column="project_output" property="project_output"/>
+        <result column="actuallyOut" property="actuallyOutput"/>
+        <result column="qUserAccount" property="qUserAccount"/>
+        <result column="cUserAccount" property="cUserAccount"/>
+        <result column="userName" property="userName"/>
+    </resultMap>
+
+    <resultMap id="outPutWrapRM" type="cn.ux.jxxt.domain.custom.OutPutWrap">
+        <id column="id" property="id"/>
+        <result column="type_id" property="typeId"/>
+        <result column="project_no" property="projectNo"/>
+        <result column="project_ratio" property="projectRatio"/>
+        <result column="work_load" property="workLoad"/>
+    </resultMap>
+
+    <resultMap id="groupRM" type="cn.ux.jxxt.domain.WorkGroup">
+        <id column="id" property="id"/>
+        <result column="name" property="gName"/>
+        <result column="create_time" property="createTime"/>
+        <result column="head_man" property="headMan"/>
+        <result column="deputy_leader" property="deputyLeader"/>
+    </resultMap>
+
+
+    <select id="getCharDatas" resultMap="chartDataRM">
+        select project.id,project.project_no project_no,project.project_name project_name,
+        project.project_authorize project_authorize,
+        project_user.user_name project_user_name,
+        project_user.user_phone project_user_phone,
+        project.project_money project_receivable,
+        project.project_charge project_charge
+        from project
+        left join project_user on project.project_no =project_user.project_no
+
+        <if test="project_charge != null">
+            where project.project_charge = '${project_charge}'
+            <if test="startDate != null">
+                and project.project_start_date_time between '${startDate}' and '${endDate}'
+            </if>
+        </if>
+        <if test="project_charge == null">
+            <if test="startDate != null">
+                where project.project_start_date_time between '${startDate}' and '${endDate}'
+            </if>
+        </if>
+    </select>
+
+    <select id="getProjectSum" resultMap="planRateRM">
+        select project_group.id,project_group.project_no project_no,
+        project_group.group_id group_id,project_group.output_rate output_rate,
+        project.project_name project_name,project_group.project_output project_output,
+        project_group.project_actually_output actuallyOut
+        from project_group
+        left join project on project_group.project_no = project.project_no
+        left join project_plan on project_group.project_no = project_plan.project_no
+        where project_group.group_id = #{id}
+        <if test="startDate != null">
+            and project_plan.project_begun_date_time between '${startDate}' and '${endDate}'
+        </if>
+    </select>
+
+    <select id="getProjectQuality" resultMap="planRateRM">
+        select project_group.id,project_group.project_no project_no,
+        project_group.group_id group_id,project.project_name project_name,
+        check_quality.quality_score quality_score,check_quality.quality_useraccount qUserAccount,
+        check_quality.quality_confirmaccount cUserAccount,user.username userName
+        from project_group
+        left join project on project_group.project_no = project.project_no
+        left join check_quality on project_group.project_no = check_quality.project_no
+        left join project_plan on project_plan.project_no = project.project_no
+        left join user on user.useraccount = project_plan.project_charge_account
+        where project_group.group_id = #{id} and project.project_stage &gt; 4
+        <if test="startDate != null">
+            and project.project_start_date_time between '${startDate}' and '${endDate}'
+        </if>
+    </select>
+
+    <select id="getQuality" resultMap="planRateRM">
+        select project_group.id,project_group.project_no project_no,
+        project_group.group_id group_id,project.project_name project_name,
+        check_quality.quality_score quality_score,check_quality.quality_useraccount qUserAccount,
+        check_quality.quality_confirmaccount cUserAccount,user.username userName
+        from project_group
+        left join project on project_group.project_no = project.project_no
+        left join check_quality on project_group.project_no = check_quality.project_no
+        left join project_plan on project_plan.project_no = project.project_no
+        left join user on user.useraccount = project_plan.project_charge_account
+        where project_group.group_id = #{id} and project.project_stage &gt; 4
+        <if test="startDate != null">
+            and project.project_start_date_time between '${startDate}' and '${endDate}'
+        </if>
+    </select>
+
+    <select id="getOutputwrap" resultMap="outPutWrapRM">
+        select id,type_id,project_no,project_ratio,work_load
+        from check_output where project_no = #{project_no}
+    </select>
+
+    <select id="getGroup" resultMap="groupRM">
+        select * from work_group
+        where id = #{workId}
+    </select>
+
+    <select id="getProjects" resultMap="planRateRM">
+        select project_group.id,project_group.project_no project_no,
+        project_group.output_rate output_rate,project.project_type project_type,
+        project.project_name project_name,project_group.project_output project_output,
+        project_plan.project_begun_date_time finish_date_time,
+        project_group.project_actually_output actuallyOut
+        from project_group
+        LEFT JOIN project on project_group.project_no = project.project_no
+        left join project_plan on project_group.project_no = project_plan.project_no
+        where project_group.group_id = #{id}
+        <if test="startDate != null">
+            and project_plan.project_begun_date_time between '${startDate}' and '${endDate}'
+        </if>
+    </select>
+
+    <select id="getUserName" resultType="java.lang.String">
+        select user.username from user where useraccount = #{userAccount}
+    </select>
+</mapper>

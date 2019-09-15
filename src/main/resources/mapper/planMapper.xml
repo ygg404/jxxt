@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.ux.jxxt.dao.ProjectPlanDao">
+    <resultMap id="planRM" type="cn.ux.jxxt.domain.ProjectPlan">
+        <id column="id" property="id"/>
+        <result column="execute_standard" property="projectExecuteStandard"/>
+        <result column="work_note" property="projectWorkNote"/>
+        <result column="work_require" property="projectWorkRequire"/>
+        <result column="project_writer" property="projectWriter"/>
+        <result column="project_no" property="projectNo"/>
+        <result column="project_type" property="projectType"/>
+        <result column="project_authorize" property="projectAuthorize"/>
+        <result column="project_charge" property="projectCharge"/>
+        <result column="project_num" property="projectNum"/>
+        <result column="project_name" property="projectName"/>
+        <result column="project_user_name" property="userName"/>
+        <result column="project_user_phone" property="userPhone"/>
+        <result column="projectSetUp" property="projectSetUp"/>
+        <result column="projectBusiness" property="projectBusiness"/>
+        <result column="projectNote" property="projectNote"/>
+        <result column="group_id" property="groupId"/>
+        <result column="projectOutPut" property="projectOutPut"/>
+        <result column="projectOutPutNote" property="projectOutPutNote"/>
+        <result column="projectWorkLoad" property="projectWorkLoad"/>
+        <result column="projectBegunDate" property="projectBegunDate"/>
+        <result column="projectWorkDate" property="projectWorkDate"/>
+        <result column="projectQualityDate" property="projectQualityDate"/>
+        <collection property="rateList" ofType="cn.ux.jxxt.domain.PlanRate" column="project_no"
+                    select="queryPlanRate">
+        </collection>
+    </resultMap>
+
+    <insert id="addProjectPlan" parameterType="cn.ux.jxxt.domain.ProjectPlan">
+        insert into project_plan(execute_standard,work_note,work_require,
+        project_writer,project_no,project_charge,project_charge_account,
+        project_output,project_output_note,project_workload,project_begun_date_time,
+        project_work_date,project_quality_date)
+        values
+        (#{projectExecuteStandard},#{projectWorkNote},#{projectWorkRequire},
+        #{projectWriter},#{projectNo},#{projectCharge},#{projectAccount},
+        #{projectOutPut},#{projectOutPutNote},#{projectWorkLoad},#{projectBegunDate},
+        #{projectWorkDate},#{projectQualityDate})
+    </insert>
+
+    <insert id="addProjectGroups">
+        insert into project_group(project_no,group_id,output_rate,short_date_time,last_date_time,project_output)
+        values
+        (#{p_no},#{g_Id},#{o_rate},#{shortDate},#{lastDate},#{output})
+    </insert>
+
+    <update id="updatePlan" parameterType="cn.ux.jxxt.domain.ProjectPlan">
+        update project_plan set
+        <trim suffixOverrides=",">
+            <if test="projectNo != null">project_no = #{projectNo},</if>
+            <if test="projectExecuteStandard != null">execute_standard = #{projectExecuteStandard},</if>
+            <if test="projectWorkNote != null">work_note = #{projectWorkNote},</if>
+            <if test="projectWorkRequire != null">work_require = #{projectWorkRequire},</if>
+            <if test="projectWriter != null">project_writer = #{projectWriter},</if>
+            <if test="projectCharge != null">project_charge = #{projectCharge},</if>
+            <if test="projectAccount != null">project_charge_account = #{projectAccount},</if>
+            <if test="projectOutPut != null">project_output = #{projectOutPut},</if>
+            <if test="projectOutPutNote != null">project_output_note = #{projectOutPutNote},</if>
+            <if test="projectWorkLoad != null">project_workload = #{projectWorkLoad},</if>
+            <if test="projectBegunDate != null">project_begun_date_time = #{projectBegunDate},</if>
+            <if test="projectWorkDate != null">project_work_date = #{projectWorkDate},</if>
+            <if test="projectQualityDate != null">project_quality_date = #{projectQualityDate}</if>
+        </trim>
+        where project_no = #{projectNo}
+    </update>
+
+    <update id="updatePlanOutPut">
+        update project_plan set project_output = #{projectOutPut} where project_no = #{projectNo}
+    </update>
+
+    <update id="updatePlanGroup">
+        update project_group set
+        <trim suffixOverrides=",">
+            <if test="g_Id != null">group_id = #{g_Id},</if>
+            <if test="o_rate != null">output_rate = #{o_rate},</if>
+            <if test="shortDate != null">short_date_time = #{shortDate},</if>
+            <if test="lastDate != null">last_date_time = #{lastDate}</if>
+        </trim>
+        where group_id = #{g_Id}
+    </update>
+
+    <select id="getPlanData" resultMap="planRM">
+      select project_plan.id,project_plan.execute_standard,project_plan.work_note,project_plan.work_require,
+      project_plan.project_writer,project.project_no project_no,project.project_charge projectBusiness,
+      project_plan.project_charge,project_plan.project_output projectOutPut,project_plan.project_output_note projectOutPutNote,
+      project_plan.project_workload projectWorkLoad,project_plan.project_begun_date_time projectBegunDate,
+      project_plan.project_work_date projectWorkDate,project_plan.project_quality_date projectQualityDate,
+      project.project_note projectNote,
+      project.project_type project_type,project.project_authorize project_authorize,
+      project.project_name project_name,project_user.user_name project_user_name,
+      project_user.user_phone project_user_phone,user.username projectSetUp
+      from project
+      left join project_plan on project.project_no = project_plan.project_no
+      left join project_user on project_user.project_no = project.project_no
+      left join user_project on user_project.project_no = project.project_no
+      left join user on user.id = user_project.user_id
+      where project.project_no = #{project_no}
+    </select>
+
+    <!--<select id="queryPlanRate" resultType="cn.ux.jxxt.domain.PlanRate">
+         select project_group.id,project_group.group_id,
+         project_group.output_rate,work_group.name groupName,
+         short_date_time shortDate,last_date_time lastDate
+         from project_group
+         left join work_group on project_group.group_id = work_group.id
+         where project_no = #{projectNo}
+    </select>-->
+
+    <select id="queryPlanRate" resultType="cn.ux.jxxt.domain.PlanRate">
+         select project_group.id,project_group.group_id,project_group.project_output,
+         project_group.output_rate,work_group.name groupName,
+         short_date_time shortDate,last_date_time lastDate
+         from project_group
+         left join work_group on project_group.group_id = work_group.id
+         where project_no = #{projectNo}
+    </select>
+
+    <select id="getWorkRate" resultType="cn.ux.jxxt.domain.PlanRate">
+        select p.id, p.project_no,p.group_id,p.output_rate,p.short_date_time shortDate,p.last_date_time
+        lastDate
+         from project_group p where project_no = #{p_no} and group_id = #{g_Id}
+    </select>
+
+    <select id="getWorkPlanData" resultType="java.lang.String">
+        select p.project_no from project_plan p where project_no = #{projectNo}
+    </select>
+
+    <delete id="deleteGroup">
+        delete from project_group where project_no = #{projectNo}
+    </delete>
+
+    <select id="getProjectOutPut" resultType="java.lang.Float">
+        select project_plan.project_output projectOutPut from project_plan
+        where project_no = #{projectNo}
+    </select>
+
+    <update id="updateProjectAccount">
+        update project set project_charge_account = #{chargeAccount} where project_no = #{projectNo}
+    </update>
+</mapper>

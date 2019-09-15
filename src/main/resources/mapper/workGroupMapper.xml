@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.ux.jxxt.dao.WorkGroupDao">
+
+    <resultMap id="groupRM" type="cn.ux.jxxt.domain.WorkGroup">
+        <id column="id" property="id"/>
+        <result column="name" property="gName"/>
+        <result column="create_time" property="createTime"/>
+        <result column="head_man" property="headMan"/>
+        <result column="deputy_leader" property="deputyLeader"/>
+        <result column="head_id" property="headId"/>
+        <result column="deputy_id" property="deputyId"/>
+        <result column="f_id" property="fId"/>
+    </resultMap>
+
+    <!--新增作业组数据-->
+    <insert id="insertGroup" parameterType="cn.ux.jxxt.domain.WorkGroup">
+      insert into work_group(id,name,f_id,create_time,head_man,deputy_leader,head_id,deputy_id)
+      values
+      (#{id},#{gName},#{fId},#{createTime},#{headMan},#{deputyLeader},#{headId},#{deputyId})
+    </insert>
+    <!--查询所有作业组数据-->
+    <select id="queryGroup" resultMap="groupRM">
+        select * from work_group order by f_id asc
+    </select>
+
+    <select id="getGroupByMin" resultMap="groupRM">
+        select * from work_group order by f_id ASC LIMIT 0,1
+    </select>
+
+    <select id="getGroupByMax" resultMap="groupRM">
+        select * from work_group order by f_id DESC LIMIT 0,1
+    </select>
+
+    <update id="updateGroupFid">
+        update work_group set f_id = #{fId} where id = #{id}
+    </update>
+
+    <!--根据组id删除指定作业组-->
+    <delete id="deleteGroup">
+        delete from work_group where id = #{groupId}
+    </delete>
+    <!--根据组id更新对应的组数据-->
+    <update id="updateGroup" parameterType="cn.ux.jxxt.domain.WorkGroup">
+        update work_group
+        set name=#{gName},
+        head_man=#{headMan},
+        deputy_leader = #{deputyLeader},
+        head_id = #{headId},
+        deputy_id = #{deputyId}
+        where id = #{id}
+    </update>
+
+    <select id="queryGroupById" parameterType="java.lang.Long" resultMap="groupRM">
+        select * from work_group where id = #{groupId}
+    </select>
+
+    <select id="queryGroupByName" parameterType="java.lang.String" resultMap="groupRM">
+        select * from work_group where name =#{groupName}
+    </select>
+
+    <select id="getGroupsNumber" resultType="java.lang.Long">
+        select count(id) from work_group
+        <if test="search != null">where (name like '%${search}%')</if>
+    </select>
+
+    <select id="queryGroupsPaginated" resultMap="groupRM">
+        select * from work_group
+        <if test="search != null">where (name like '%${search}%')</if>
+        order by
+        <choose>
+          <when test="sortBy == 'createdDateTime'">create_time</when>
+          <otherwise>${sortBy}</otherwise>
+        </choose>
+
+        <choose>
+            <when test="desc == true">desc</when>
+            <otherwise>asc</otherwise>
+        </choose>
+        limit #{offset},#{per_page}
+    </select>
+
+    <select id="getWorkName" resultType="java.lang.String">
+        select work_group.name name
+        from project_group
+        left join work_group on project_group.group_id = work_group.id
+        where project_group.project_no = #{projectNo}
+    </select>
+
+    <insert id="addGroupInfo">
+        insert into p_group(name,f_id)
+        values (#{name},#{fId})
+    </insert>
+
+    <select id="getGroupByName" resultType="cn.ux.jxxt.domain.UserGroup">
+        select * from p_group where name = #{name}
+    </select>
+
+    <select id="getGroupById" resultMap="groupRM">
+        select * from work_group where id = #{id}
+    </select>
+
+    <select id="getGroupByfId" resultType="cn.ux.jxxt.domain.UserGroup">
+        select * from p_group where f_id = #{fId}
+    </select>
+
+    <select id="getGroupUserById" resultType="cn.ux.jxxt.domain.UserGroup">
+        select * from p_group_user where group_id = #{id}
+    </select>
+
+    <delete id="deleteGroupUserById" >
+        delete from p_group_user where group_id = #{id}
+    </delete>
+
+    <delete id="deleteGroupById">
+        delete from p_group where id = #{id}
+    </delete>
+
+    <delete id="deleteGroupByFid">
+        delete from p_group where f_id = #{id}
+    </delete>
+
+    <update id="updateGroupById" parameterType="cn.ux.jxxt.domain.UserGroup">
+        update p_group set
+        <trim suffixOverrides=",">
+            <if test="name != null">name = #{name},</if>
+            <if test="fId != null">f_id = #{fId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <select id="selectGroup" resultMap="groupRM">
+        select id,name,head_id from work_group
+    </select>
+
+    <select id="selectUserId" resultType="java.lang.Long">
+        select id from user where useraccount = #{userAccount}
+    </select>
+
+    <select id="getUserGroupById" resultMap="groupRM">
+        select id from user_group where user_id = #{userId}
+    </select>
+    <delete id="deleteUserGroup">
+        delete from user_group where user_id = #{userId}
+    </delete>
+
+    <select id="getTopGroupById" resultMap="groupRM">
+        select * from work_group where f_id = (select f_id from work_group where f_id &lt; #{f_id} order by f_id desc limit 1);
+    </select>
+</mapper>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.ux.jxxt.dao.FileListDao">
+    <resultMap id="fileRM" type="cn.ux.jxxt.domain.FileData">
+        <id column="fileNo" property="fileNo"/>
+        <result column="fileUrl" property="fileUrl"/>
+        <result column="fileName" property="fileName"/>
+        <result column="filetypeId" property="filetypeId"/>
+        <result column="filetype" property="filetype"/>
+        <result column="createUserId" property="createUserId"/>
+        <result column="createUser" property="createUser"/>
+        <result column="createTime" property="createTime"/>
+    </resultMap>
+    <select id="getFiledataList" resultMap="fileRM">
+        select a.*,b.username as createUser, c.name as filetype from file_list a
+        left join user b on b.id = a.createUserId
+        left join  file_type c on c.id = a.filetypeId
+        where 1=1
+        <if test="startDate != null">
+            and a.createTime between '${startDate}' and '${endDate}'
+        </if>
+
+        <if test="search != null">and (a.fileNo like '%${search}%'
+            or a.fileName like '%${search}%')
+        </if>
+        <if test="userId != null">
+            and a.createUserId = ${userId}
+        </if>
+        <if test="typeId != null">
+            and a.filetypeId = ${typeId}
+        </if>
+        order by ${sortBy}
+        <choose>
+            <when test="desc == true">desc</when>
+            <otherwise>asc</otherwise>
+        </choose>
+        limit #{offset},#{per_page}
+    </select>
+
+    <delete id="deleteFilelistByFileno">
+        delete from file_list where  fileNo = #{fileNo}
+    </delete>
+
+    <select id="getFiledataListByFileNo" resultMap="fileRM">
+        select * from file_list where fileNo = #{fileNo}
+    </select>
+
+    <select id="getFilelistCount" resultType="java.lang.Long">
+        select count(*) from file_list p
+        where 1 = 1
+        <if test="startDate != null">
+            and p.createTime between '${startDate}' and '${endDate}'
+        </if>
+
+        <if test="search != null">and (p.fileNo like '%${search}%'
+            or p.fileName like '%${search}%')
+        </if>
+
+        <if test="userId != null">
+            and p.createUserId = ${userId}
+        </if>
+        <if test="typeId != null">
+            and p.filetypeId = ${typeId}
+        </if>
+    </select>
+
+    <insert id="addFilelist" parameterType="cn.ux.jxxt.domain.Filelist">
+        insert into file_list(fileUrl,fileName,filetypeId,createUserId,createTime)
+        values(#{fileUrl},#{fileName},#{filetypeId},#{createUserId},#{createTime})
+    </insert>
+
+    <update id="updateFilelist" parameterType="cn.ux.jxxt.domain.Filelist">
+        update file_list set fileName = #{fileName},filetypeId = #{filetypeId}, fileUrl = #{fileUrl} where fileNo = #{fileNo}
+    </update>
+
+
+
+</mapper>
