@@ -166,12 +166,12 @@ public class ProjectQualityController {
      * 修改结算时间
      * @return
      */
-    @PostMapping(value = "/projectQuality/changetime/")
-    public ResponseEntity<?> changeFinishDateTime(@Valid @RequestBody CheckQuality checkQuality,  BindingResult bindingResult){
+    @PostMapping(value = "/projectQuality/editcutofftime/")
+    public ResponseEntity<?> editCutoffDateTime(@Valid @RequestBody CheckQuality checkQuality,  BindingResult bindingResult){
         if(bindingResult.hasErrors()){
             throw new InvalidRequestException("修改出错");
         }
-        CheckQualityDTO returnDTO = projectQualityService.changeFinishDateTime(checkQuality);
+        CheckQualityDTO returnDTO = projectQualityService.editCutoffDateTime(checkQuality);
         if(!TextUtils.isEmpty(returnDTO.getError())){
             message.setMessage(returnDTO.getError());
             return ResponseEntity.badRequest().body(message);

@@ -9,6 +9,7 @@
         <result column="project_no" property="projectNo"/>
         <result column="project_examine_note" property="projectExamineNote"/>
         <result column="groupId" property="groupId"/>
+        <result column="cut_off_time" property="cutOffTime"/>
     </resultMap>
 
     <insert id="addQualityData" parameterType="cn.ux.jxxt.domain.CheckQuality">
@@ -41,7 +42,7 @@
 
     <select id="getQualityData" resultMap="qualityRM">
         select cq.final_check_suggestion,cq.quality_note,cq.quality_score,cq.project_no,
-        project.examine_note project_examine_note
+        project.examine_note project_examine_note,cq.cut_off_time
         from check_quality cq
         left join project on project.project_no = cq.project_no
         where cq.project_no = #{project_no}
@@ -118,6 +119,10 @@
 
     <update id="addFinishDateTime">
         update check_quality set finish_date_time = #{finishDateTime} where project_no = #{projectNo}
+    </update>
+
+    <update id="setCutoffTime">
+        update check_quality set cut_off_time = #{cutOffTime}  where project_no = #{projectNo}
     </update>
 
     <select id="getFinishDateTime" resultType="java.lang.String">

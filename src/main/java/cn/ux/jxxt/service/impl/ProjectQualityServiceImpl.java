@@ -153,16 +153,28 @@ public class ProjectQualityServiceImpl implements ProjectQualityService {
     @Override
     public CheckQualityDTO addFinishDateTime(CheckQuality checkQuality) {
         CheckQualityDTO returnDTO = new CheckQualityDTO();
+        Project project = projectDao.getProjectByNo(checkQuality.getProjectNo());
+        //质检提交至产值核算 进度 改为100% 并判断当前产值是否为100
+        ProjectSchedule schedule = projectDao.getWorkSchedule(project.getProjectNo());
+        if(schedule.getProjectRate() != 100) {
+            schedule.setProjectRate(100);
+            schedule.setProjectCreateTime(Timestamp.valueOf(sdf.format(new Date())));
+            schedule.setProjectNo(checkQuality.getProjectNo());
+            schedule.setProjectNote("已提交至产值核算.");
+            schedule.setGroupId(0);
+            schedule.setProjectName(project.getProjectName());
+            projectDao.addSchedule(schedule);
+        }
+
         if(!TextUtils.isEmpty(checkQualityDao.getFinishDateTime(checkQuality.getProjectNo()))){
             returnDTO.setError("已成功添加时间");
             return returnDTO;
         }
         checkQuality.setFinishDateTime(Timestamp.valueOf(sdf.format(new Date())));
+        checkQuality.setCutOffTime(Timestamp.valueOf( sdf.format(new Date())));//设置结算时间
         checkQualityDao.addFinishDateTime(checkQuality);
-        ProjectSchedule schedule = new ProjectSchedule();
-        schedule.setProjectRate(100);
-        schedule.setProjectNo(checkQuality.getProjectNo());
-        projectDao.updateSchedule(schedule);
+        checkQualityDao.setCutoffTime(checkQuality);
+
         returnDTO.setSuccess("添加成功");
         return returnDTO;
     }
@@ -178,10 +190,10 @@ public class ProjectQualityServiceImpl implements ProjectQualityService {
     }
 
     @Override
-    public CheckQualityDTO changeFinishDateTime(CheckQuality checkQuality){
+    public CheckQualityDTO editCutoffDateTime(CheckQuality checkQuality){
         CheckQualityDTO returnDTO = new CheckQualityDTO();
         Map<String,Object> params = new HashMap<>();
-        checkQualityDao.addFinishDateTime(checkQuality);
+        checkQualityDao.setCutoffTime(checkQuality);
         return returnDTO;
     }
 }

@@ -162,39 +162,42 @@ public class ChartDataServiceImpl implements ChartDataService {
             Float Sums = 0f;    //每个项目的产值
             params.put("id",w.getId());
             //查询指定工作组的所有项目
-            List<PlanRate> rateList = chartDataDao.getProjectSum(params);
+            List<PlanRate> rateList = chartDataDao.getFinishProjectSum(params);
             ProjectSum = rateList.size();
 
             List<PlanRate> planRateList = new ArrayList<>();
             if(ProjectSum > 0){
                 for(PlanRate p : rateList){
                     //得出该项目小组获得的产值
-                    if(p.getActuallyOutput() > 0 ) {
+                    if(p.getActuallyOutput() >= 0 ) {
                         OutPutNum = p.getActuallyOutput();
                     }else{
                         OutPutNum = p.getProject_output();
                     }
                     Sums += OutPutNum;
+                    p.setOutputNum(OutPutNum);
+                    p.setFinishDateTime(p.getFinishDateTime().substring(0,10));
+                    planRateList.add(p);
                 }
                 //查询指定的小组在某时间段的项目
-                List<PlanRate> list2 = chartDataDao.getProjects(params);
-                Float Output_num = 0f; //产值
-                Float sum = 0f;
-                for (PlanRate prl : list2) {
-                    //得出该项目小组获得的产值
-                    if(prl.getActuallyOutput() > 0 ) {
-                        Output_num = prl.getActuallyOutput();
-                    }else{
-                        Output_num = prl.getProject_output();
-                    }
-                    PlanRate pr = new PlanRate();
-                    pr.setId(prl.getId());
-                    pr.setProjectName(prl.getProjectName());
-                    pr.setProjectType(prl.getProjectType());
-                    pr.setFinishDateTime(prl.getFinishDateTime());
-                    pr.setOutputNum(Output_num);
-                    planRateList.add(pr);
-                }
+//                List<PlanRate> list2 = chartDataDao.getProjects(params);
+//                Float Output_num = 0f; //产值
+//                Float sum = 0f;
+//                for (PlanRate prl : list2) {
+//                    //得出该项目小组获得的产值
+//                    if(prl.getActuallyOutput() > 0 ) {
+//                        Output_num = prl.getActuallyOutput();
+//                    }else{
+//                        Output_num = prl.getProject_output();
+//                    }
+//                    PlanRate pr = new PlanRate();
+//                    pr.setId(prl.getId());
+//                    pr.setProjectName(prl.getProjectName());
+//                    pr.setProjectType(prl.getProjectType());
+//                    pr.setFinishDateTime(prl.getFinishDateTime());
+//                    pr.setOutputNum(Output_num);
+//                    planRateList.add(pr);
+//                }
             }
 
             WorkGroup wg = new WorkGroup();

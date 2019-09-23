@@ -377,16 +377,21 @@ public class ProjectServiceImpl implements ProjectService {
         Map<String, Object> params = new HashMap<>();
         for(WorkGroup workGroup : projectDTO.getGroupList()){
             for(OutPutWrap outPutWrap : workGroup.getOutPutWraps()){
+                params.put("typeId", outPutWrap.getId());
+                params.put("projectNo", projectDTO.getProjectNo());
+                params.put("projectRatio", outPutWrap.getProjectRatio());
+                params.put("workLoad", outPutWrap.getWorkLoad());
+                params.put("groupId", workGroup.getId());
                 if(outPutWrap.isCheck()) {
-                    params.put("typeId", outPutWrap.getId());
-                    params.put("projectNo", projectDTO.getProjectNo());
-                    params.put("projectRatio", outPutWrap.getProjectRatio());
-                    params.put("workLoad", outPutWrap.getWorkLoad());
-                    params.put("groupId", workGroup.getId());
                     if(projectDao.getOutPutDataByTypeId(params) == null){                   //判断该项目下的各个子项产值
                         projectDao.addOutPutData(params);
                     }else{
                         projectDao.updateOutPutData(params);
+                    }
+                }else{
+                    //作业类型没有勾选则删除
+                    if(projectDao.getOutPutDataByTypeId(params) != null) {                   //判断该项目下的各个子项产值
+                        projectDao.deleteOutPutData(params);
                     }
                 }
             }
@@ -426,10 +431,17 @@ public class ProjectServiceImpl implements ProjectService {
             params.put("projectNo", projectDTO.getProjectNo());
             params.put("projectRatio", putWrap.getProjectRatio());
             params.put("workLoad", putWrap.getWorkLoad());
-            if(projectDao.getOutPutDataByTypeId(params) == null){
-                projectDao.addOutPutData(params);
+            if(putWrap.isCheck()) {
+                if(projectDao.getOutPutDataByTypeId(params) == null){                   //判断该项目下的各个子项产值
+                    projectDao.addOutPutData(params);
+                }else{
+                    projectDao.updateOutPutData(params);
+                }
             }else{
-                projectDao.updateOutPutData(params);
+                //作业类型没有勾选则删除
+                if(projectDao.getOutPutDataByTypeId(params) != null) {                   //判断该项目下的各个子项产值
+                    projectDao.deleteOutPutData(params);
+                }
             }
         }
         returnDTO.setSuccess("更新成功");
@@ -979,6 +991,11 @@ public class ProjectServiceImpl implements ProjectService {
                 schedule.setqFDateTime(new SimpleDateFormat("yyyy-MM-dd").format(schedule.getqFinishDateTime()));
                 schedule.setwFDateTime(new SimpleDateFormat("yyyy-MM-dd").format(schedule.getwFinishDateTime()));
             }
+
+            if(schedule.getcFinishDateTime() != null){
+                schedule.setcDateTime(new SimpleDateFormat("yyyy-MM-dd").format(schedule.getcFinishDateTime()));           //格式化项目结算时间
+            }
+
             if (projectDao.getBackNum(schedule.getProjectNo()) != null) {
                 schedule.setBackNum(projectDao.getBackNum(schedule.getProjectNo()));                                    //添加返修次数
             }else{

@@ -134,12 +134,9 @@
                 </otherwise>
             </choose>
         </if>
-        <choose>
-            <when test="startDate != null">
-                and project.project_start_date_time between '${startDate}' and '${endDate}'
-            </when>
-            <otherwise>and DATE_FORMAT(project.project_start_date_time,'%Y%m')=DATE_FORMAT(CURDATE(),'%Y%m')</otherwise>
-        </choose>
+        <if test="startDate != null">
+            and project.project_start_date_time between '${startDate}' and '${endDate}'
+        </if>
         <if test="search != null">and (project.project_no like '%${search}%'
             or project.project_name like '%${search}%'
             or project.project_num like '%${search}%'
@@ -181,12 +178,9 @@
         </choose>
         <if test="groupId > 0">and project_group.group_id = #{groupId}</if>
         <if test="stageId != null">and project.project_stage = #{stageId}</if>
-        <choose>
-            <when test="startDate != null">
-                and project.project_start_date_time between '${startDate}' and '${endDate}'
-            </when>
-            <otherwise>and DATE_FORMAT(project.project_start_date_time,'%Y%m')=DATE_FORMAT(CURDATE(),'%Y%m')</otherwise>
-        </choose>
+        <if test="startDate != null">
+              and project.project_start_date_time between '${startDate}' and '${endDate}'
+        </if>
         <if test="search != null">and (project.project_no like '%${search}%'
             or project.project_name like '%${search}%'
             or project.project_num like '%${search}%'
@@ -370,6 +364,10 @@
         where project_no = #{projectNo} and type_id = #{typeId} and group_id = #{groupId}
     </update>
 
+    <delete id="deleteOutPutData">
+        delete  from check_output where project_no = #{projectNo} and type_id = #{typeId} and group_id = #{groupId}
+    </delete>
+
     <select id="getOutPutDataByTypeId" resultMap="outputRM">
       select * from check_output where type_id = #{typeId} and project_no = #{projectNo} and group_id = #{groupId}
     </select>
@@ -383,28 +381,26 @@
     </select>
 
     <select id="getProjectCount" resultType="java.lang.Long">
-        select count(*) from project <choose>
-        <when test="p_stage == 1">where p_stage = 1</when>
-        <otherwise>where p_stage = 2</otherwise>
-    </choose>
+        select count(*) from project
+        <choose>
+            <when test="p_stage == 1">where p_stage = 1</when>
+            <otherwise>where p_stage = 2</otherwise>
+        </choose>
         <if test="userAccount != null">and project.project_charge_account = #{userAccount}</if>
         <if test="groupId > 0">and project_group.group_id = #{groupId}</if>
         <if test="stageId != null">
           <choose>
               <when test="stageId == 5">
-                  and project.project_stage = 5 or project.project_stage = 6 or project.project_stage = 9
+                  and (project.project_stage = 5 or project.project_stage = 6 or project.project_stage = 9)
               </when>
               <otherwise>
                   and project.project_stage = #{stageId}
               </otherwise>
           </choose>
         </if>
-        <choose>
-            <when test="startDate != null">
-                and project.project_start_date_time between '${startDate}' and '${endDate}'
-            </when>
-            <otherwise>and DATE_FORMAT(project.project_start_date_time,'%Y%m')=DATE_FORMAT(CURDATE(),'%Y%m')</otherwise>
-        </choose>
+        <if test="startDate != null">
+              and project.project_start_date_time between '${startDate}' and '${endDate}'
+        </if>
         <if test="search != null">and (project.project_no like '%${search}%'
             or project.project_name like '%${search}%'
             or project.project_num like '%${search}%'
@@ -421,12 +417,10 @@
     </choose>
         <if test="groupId > 0">and project_group.group_id = #{groupId}</if>
         <if test="stageId != null">and project.project_stage = #{stageId}</if>
-        <choose>
-            <when test="startDate != null">
-                and project.project_start_date_time between '${startDate}' and '${endDate}'
-            </when>
-            <otherwise>and DATE_FORMAT(project.project_start_date_time,'%Y%m')=DATE_FORMAT(CURDATE(),'%Y%m')</otherwise>
-        </choose>
+        <if test="startDate != null">
+              and project.project_start_date_time between '${startDate}' and '${endDate}'
+        </if>
+
         <if test="search != null">and (project.project_no like '%${search}%'
             or project.project_name like '%${search}%'
             or project.project_num like '%${search}%'
@@ -796,6 +790,7 @@
         <result column="project_work_date" property="projectWorkDate"  />
         <result column="project_quality_date" property="projectQualityDate"  />
         <result column="qualityDateTime" property="qFinishDateTime"/>
+        <result column="cutOffDateTime" property="cFinishDateTime" />
         <result column="workDateTime" property="wFinishDateTime" />
         <result column="projectBegunDate" property="projectBegunDate" />
         <result column="contractNo" property="contractNo" />
@@ -939,7 +934,7 @@
         a.project_actually_finish_date projectActuallyFinishDate,
         project_plan.project_work_date projectWorkDate,project_plan.project_quality_date projectQualityDate,
         project_plan.project_begun_date_time projectBegunDate,
-        project_work.finish_date_time wFinishDateTime,check_quality.finish_date_time qFinishDateTime,
+        project_work.finish_date_time wFinishDateTime,check_quality.finish_date_time qFinishDateTime,check_quality.cut_off_time cFinishDateTime,
         project.project_actually_finish_num projectActuallyFinishNum,
         contract_project.contract_no contractNo
 
@@ -953,10 +948,8 @@
         and (project.project_stage BETWEEN 3 and 6)
         <if test="userAccount != null"> and project.project_charge_account = #{userAccount}</if>
 
-        <choose>
-            <when test="startDate != null">and a.project_create_time between '${startDate}' and '${endDate}' </when>
-            <otherwise>and a.project_create_time >= CONCAT(date_format(date_add(NOW(), interval -1 MONTH) ,'%Y-%m') ,'-01') </otherwise>
-        </choose>
+        <if test="startDate != null">and project_plan.project_begun_date_time between '${startDate}' and '${endDate}' </if>
+
 
         <if test="search != null">and (a.project_no like '%${search}%'
             or a.project_note like '%${search}%'
@@ -981,10 +974,7 @@
         where not exists (select * from project_schedule b where a.project_no = b.project_no and a.project_create_time &lt; project_create_time )
         and (project.project_stage BETWEEN 3 and 6)
         <if test="userAccount != null"> and project.project_charge_account = #{userAccount}</if>
-        <choose>
-            <when test="startDate != null">and a.project_create_time between '${startDate}' and '${endDate}' </when>
-            <otherwise>and a.project_create_time >= CONCAT(date_format(date_add(NOW(), interval -1 MONTH) ,'%Y-%m') ,'-01') </otherwise>
-        </choose>
+        <if test="startDate != null">and project_plan.project_begun_date_time between '${startDate}' and '${endDate}' </if>
 
         <if test="search != null">and (a.project_no like '%${search}%'
             or a.project_note like '%${search}%'
@@ -1004,7 +994,7 @@
         SELECT p.project_no,p.project_name,p.project_start_date_time,p.project_stage,p.p_stage,
         ps.project_rate,pp.project_output, pp.project_actually_output
         from project p
-        LEFT JOIN (SELECT project_no, project_rate, max(project_create_time) from project_schedule group by project_no,project_rate) ps on p.project_no = ps.project_no
+        LEFT JOIN (SELECT project_no, max(project_rate) project_rate from project_schedule group by project_no) ps on p.project_no = ps.project_no
         LEFT JOIN project_work pw on p.project_no = pw.project_no
         LEFT JOIN project_plan pp on p.project_no = pp.project_no
 

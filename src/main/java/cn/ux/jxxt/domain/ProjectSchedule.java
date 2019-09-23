@@ -20,10 +20,12 @@ public class ProjectSchedule {
     private long qOutTime;                                   //质量超时间
     private Timestamp wFinishDateTime;                      //作业首次提交时间
     private Timestamp qFinishDateTime;                      //质检检查完成时间
+    private Timestamp cFinishDateTime;                      //结算时间
     private long backNum;                                    //返修时间
     private String scheduleCreateTime;                      //接口返回创建时间数据
     private String wFDateTime;                              //接口返回作业首次提交时间
     private String qFDateTime;                              //接口返回质检检查完成时间
+    private String cDateTime;                               //结算时间
     private Timestamp projectBegunDate;                        //项目开工时间
     private String projectStartDate;                        //接口返回开工时间
     private int groupId;                                    //作业组id
@@ -228,5 +230,13 @@ public class ProjectSchedule {
     public void setqOutTime(long qOutTime) {
         this.qOutTime = qOutTime;
     }
+
+    public Timestamp getcFinishDateTime(){return  this.cFinishDateTime;}
+
+    public void setcFinishDateTime(Timestamp cFinishDateTime){this.cFinishDateTime = cFinishDateTime;}
+
+    public String getcDateTime() { return  this.cDateTime;}
+
+    public void setcDateTime(String cDateTime){ this.cDateTime = cDateTime;}
 }
 

@@ -14,6 +14,7 @@ public class CheckQuality {
     private String projectNo;
     private String userAccount;                 //登录账号
     private Timestamp finishDateTime;           //完成时间
+    private Timestamp cutOffTime;               //结算时间
     private ProjectPlan projectPlan;
     private ProjectWork projectWork;
     private int groupId;                    //组id
@@ -98,6 +99,10 @@ public class CheckQuality {
     public void setFinishDateTime(Timestamp finishDateTime) {
         this.finishDateTime = finishDateTime;
     }
+
+    public Timestamp getCutOffTime() {return  this.cutOffTime;}
+
+    public void setCutOffTime(Timestamp cutOffTime){ this.cutOffTime = cutOffTime;}
 
     public int getGroupId() {
         return groupId;

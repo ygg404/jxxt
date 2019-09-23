@@ -56,4 +56,18 @@
         </choose>
         limit #{offset},#{per_page}
     </select>
+
+
+    <insert id="insertWorkProjectType" parameterType="cn.ux.jxxt.domain.WorkProjectType">
+        insert into work_project_type(wtypeId,ptypeId) values (#{wtypeId},#{ptypeId})
+    </insert>
+
+    <delete id="deleteWorkProjectType">
+        delete  from work_project_type where wtypeId = #{wtypeId}
+    </delete>
+
+    <select id="getWorkTypeById" resultType="cn.ux.jxxt.domain.WorkProjectType">
+        select  w.* ,p.name ptypeName from  work_project_type w left  JOIN  project_type p on w.ptypeId = p.id where w.wtypeId = #{typeId}
+    </select>
+
 </mapper>

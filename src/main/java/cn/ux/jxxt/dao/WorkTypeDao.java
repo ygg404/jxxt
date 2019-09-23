@@ -1,5 +1,6 @@
 package cn.ux.jxxt.dao;
 
+import cn.ux.jxxt.domain.WorkProjectType;
 import cn.ux.jxxt.domain.WorkType;
 
 import java.util.List;
@@ -61,4 +62,23 @@ public interface WorkTypeDao {
      * @return
      */
     public List<WorkType> queryTypesPaginated(Map<String, Object> params);
+
+    /**
+     * 获取工作类型和所属项目类型
+     * @param typeId
+     * @return
+     */
+    public List<WorkProjectType>  getWorkTypeById(int typeId);
+
+    /**
+     * 插入项目与作业间的关系表
+     * @param type
+     */
+    public void insertWorkProjectType(WorkProjectType type);
+
+    /**
+     * 根据工作类型id 删除
+     * @param wtypeId
+     */
+    public void deleteWorkProjectType(int wtypeId);
 }

@@ -21,7 +21,7 @@ public interface ProjectQualityService {
 
     CheckQualityDTO addFinishDateTime(CheckQuality checkQuality);
 
-    CheckQualityDTO changeFinishDateTime(CheckQuality checkQuality);
+    CheckQualityDTO editCutoffDateTime(CheckQuality checkQuality);
 
     CheckQualityDTO putToOutPut(CheckQuality checkQuality);
 

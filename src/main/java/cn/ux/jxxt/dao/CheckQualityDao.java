@@ -24,6 +24,11 @@ public interface CheckQualityDao {
     public int updateQuality(CheckQuality checkQuality);
 
     /**
+     *  更新结算时间
+     */
+    public void setCutoffTime(CheckQuality checkQuality);
+
+    /**
      * 更新质量审核人
      * @param params
      * @return

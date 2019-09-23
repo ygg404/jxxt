@@ -1,6 +1,8 @@
 package cn.ux.jxxt.domain;
 
 import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.List;
 
 public class WorkType {
     private Long id;
@@ -11,6 +13,10 @@ public class WorkType {
     private Timestamp updateTime;
     private String timeData;
     private String typeOut;
+
+    //属于哪些项目类型
+    private List<WorkProjectType> ptypeList;
+    private List<String> ptypeIdList;
 
     public Long getId() {
         return id;
@@ -75,4 +81,12 @@ public class WorkType {
     public void setTypeOut(String typeOut) {
         this.typeOut = typeOut;
     }
+
+    public List<WorkProjectType> getPtypeList(){return this.ptypeList;}
+
+    public void setPtypeList(List<WorkProjectType> ptypeList){this.ptypeList = ptypeList;}
+
+    public List<String> getPtypeIdList() { return  this.ptypeIdList;}
+
+    public void setPtypeIdList(List<String> ptypeIdList){this.ptypeIdList = ptypeIdList;}
 }

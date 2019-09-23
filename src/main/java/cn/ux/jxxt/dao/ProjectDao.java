@@ -8,6 +8,7 @@ import cn.ux.jxxt.domain.custom.ProjectWrap;
 import cn.ux.jxxt.dto.ProjectDTO;
 import cn.ux.jxxt.dto.ProjectPlanDTO;
 import com.sun.corba.se.spi.ior.ObjectKey;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -126,6 +127,11 @@ public interface ProjectDao {
      */
     public int addOutPutData(Map<String, Object> params);
 
+    /**
+     * 删除产值核算数据
+     * @param params
+     */
+    public void deleteOutPutData(Map<String, Object> params);
     /**
      * 添加项目审定数据
      * @param params
@@ -714,7 +720,7 @@ public interface ProjectDao {
      * 获取所有参与部门的产值数据
      * @return
      */
-    public List<OutPutWrap> getAllOutPutList(String projectNo,long groupId);
+    public List<OutPutWrap> getAllOutPutList(@Param("projectNo") String projectNo, @Param("groupId") long groupId);
 
     /**
      * 获取所有参与部门的数据

@@ -83,6 +83,26 @@
         </if>
     </select>
 
+    <select id="getFinishProjectSum" resultMap="planRateRM">
+        select project_group.id,project_group.project_no project_no,
+        project_group.group_id group_id,project_group.output_rate output_rate,
+        project.project_name project_name,project_group.project_output project_output,
+        project_group.project_actually_output actuallyOut,
+        check_quality.finish_date_time finish_date_time,
+        project.project_type
+        from project_group
+        left join project on project_group.project_no = project.project_no
+        left join project_plan on project_group.project_no = project_plan.project_no
+        left join project_work on project_work.project_no = project_group.project_no
+        left join check_quality on check_quality.project_no = project.project_no
+        where project_group.group_id = #{id}
+        and project.project_stage between 5 and 6
+        and project.p_stage = 1 and project_work.project_stage = 0
+        <if test="startDate != null">
+            and check_quality.cut_off_time between '${startDate}' and '${endDate}'
+        </if>
+    </select>
+
     <select id="getProjectQuality" resultMap="planRateRM">
         select project_group.id,project_group.project_no project_no,
         project_group.group_id group_id,project.project_name project_name,

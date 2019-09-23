@@ -23,6 +23,11 @@ public interface ChartDataDao {
     public List<PlanRate> getProjectSum(Map<String, Object> params);
 
     /**
+     * 根据id 获取小队已完成项目
+     */
+    public List<PlanRate> getFinishProjectSum(Map<String, Object> params);
+
+    /**
      * 根据getProject_no计算产值
      * @return
      */
