@@ -81,4 +81,24 @@ public interface WorkTypeDao {
      * @param wtypeId
      */
     public void deleteWorkProjectType(int wtypeId);
+
+    /**
+     * 获取项目和工作类型列表
+     * @return
+     */
+    public List<WorkProjectType> getWorkProjectList();
+
+    /**
+     * 获取不在作业项目关系表中的工作类型id
+     * @return
+     */
+    public List<Long> getWorkIdNotIn();
+
+
+    /**
+     * 通过项
+     * @param ptypeId
+     * @return
+     */
+    public List<Long> getWorkTypeListByPid(long ptypeId);
 }
