@@ -1,5 +1,6 @@
 package cn.ux.jxxt.service;
 
+import cn.ux.jxxt.domain.WorkProjectType;
 import cn.ux.jxxt.domain.WorkType;
 import cn.ux.jxxt.dto.WorkTypeDTO;
 
@@ -15,4 +16,7 @@ public interface WorkTypeService {
     WorkTypeDTO deleteType(Long typeId);
 
     WorkTypeDTO getAllTypeByPaginated(int page, int per_page, String sortBy, boolean descending, String search);
+
+    WorkTypeDTO getWorkIdNotIn(String project_no);
+
 }

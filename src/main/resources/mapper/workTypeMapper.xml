@@ -66,8 +66,19 @@
         delete  from work_project_type where wtypeId = #{wtypeId}
     </delete>
 
+    <select id="getWorkTypeListByPid" resultType="java.lang.Long">
+        SELECT DISTINCT(wtypeId) from  work_project_type where ptypeId = #{ptypeId}
+    </select>
+    
     <select id="getWorkTypeById" resultType="cn.ux.jxxt.domain.WorkProjectType">
         select  w.* ,p.name ptypeName from  work_project_type w left  JOIN  project_type p on w.ptypeId = p.id where w.wtypeId = #{typeId}
     </select>
 
+    <select id="getWorkProjectList" resultType="cn.ux.jxxt.domain.WorkProjectType">
+        select  w.* ,p.name ptypeName from  work_project_type w left  JOIN  project_type p on w.ptypeId = p.id
+    </select>
+
+    <select id="getWorkIdNotIn" resultType="java.lang.Long">
+        select  w.id from work_type w where w.id not in (SELECT DISTINCT(wtypeId) from work_project_type)
+    </select>
 </mapper>

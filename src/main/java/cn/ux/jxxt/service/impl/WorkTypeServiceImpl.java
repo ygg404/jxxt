@@ -1,11 +1,10 @@
 package cn.ux.jxxt.service.impl;
 
 import cn.ux.jxxt.dao.LogDao;
+import cn.ux.jxxt.dao.ProjectDao;
 import cn.ux.jxxt.dao.ProjectTypeDao;
 import cn.ux.jxxt.dao.WorkTypeDao;
-import cn.ux.jxxt.domain.ProjectType;
-import cn.ux.jxxt.domain.WorkProjectType;
-import cn.ux.jxxt.domain.WorkType;
+import cn.ux.jxxt.domain.*;
 import cn.ux.jxxt.dto.WorkTypeDTO;
 import cn.ux.jxxt.service.WorkTypeService;
 import cn.ux.jxxt.util.LogUtil;
@@ -17,16 +16,19 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class WorkTypeServiceImpl implements WorkTypeService {
 
     @Autowired
     private WorkTypeDao workTypeDao;
+
+    @Autowired
+    private ProjectDao projectDao;
+
+    @Autowired
+    private ProjectTypeDao projectTypeDao;
 
     @Autowired
     private LogDao logDao;
@@ -163,4 +165,34 @@ public class WorkTypeServiceImpl implements WorkTypeService {
         logDao.addLog(LogUtil.addLog(UxContent.getUserName() + "查看所有工作类型"));
         return returnDTO;
     }
+
+    /**
+     * 获取不在作业项目关系表的工作类型id
+     * @return
+     */
+    @Override
+    public WorkTypeDTO getWorkIdNotIn(String project_no){
+        List<Long> wtypeList = new ArrayList<>();
+        //获取项目的所有工作类型
+        Project project = projectDao.getProjectByNo(project_no);
+        String projectType = project.getProjectType();
+        for(String ptype : projectType.split(",")){
+            ProjectType pType = projectTypeDao.queryTypeByName(ptype);
+            List<Long> workList = workTypeDao.getWorkTypeListByPid(  pType.getId());
+            for(Long workId : workList){
+                if( wtypeList.indexOf(workId) == -1 ){
+                    wtypeList.add(workId);
+                }
+            }
+        }
+        //获取所有 不在项目和工作关系表的 工作类型
+        List<Long> workIdNotInList = workTypeDao.getWorkIdNotIn();
+        workIdNotInList.addAll(wtypeList);
+        Collections.sort(workIdNotInList);
+        WorkTypeDTO workTypeDTO = new WorkTypeDTO();
+        workTypeDTO.setWpTypeNotInList(workIdNotInList);
+        return workTypeDTO;
+    }
+
+
 }

@@ -128,6 +128,7 @@ public class ProjectContactServiceImpl implements ProjectContractService {
             project.setProjectName(contractData.getContractName());
             project.setProjectMoney(contractData.getContractMoney());
             project.setProjectNote(contractData.getContractNote());
+            project.setProjectType(contractData.getProjectType());
             projectDao.updateProject(project);
         }
         contractDao.updateUser(params);

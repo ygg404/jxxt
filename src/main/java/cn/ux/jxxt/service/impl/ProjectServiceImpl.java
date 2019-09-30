@@ -486,7 +486,16 @@ public class ProjectServiceImpl implements ProjectService {
         projectDao.updateProject(projectDTO);
         //根据项目类型名称判断是否更新项目类型
         if (projectDTO.getProjectType() != null) {
-            if (projectTypeDao.queryTypeByName(projectDTO.getProjectType()) != null) {
+            boolean isType = true;
+            String[] typelist = projectDTO.getProjectType().split(",");
+            for(String type : typelist){
+                if(projectTypeDao.queryTypeByName(type) == null){
+                    isType = false;
+                    break;
+                }
+            }
+
+            if (isType) {
                 typeParams.put("type_name", projectDTO.getProjectType());                          //项目类型
                 typeParams.put("p_no", projectDTO.getProjectNo());
                 projectDao.updateProjectType(typeParams);

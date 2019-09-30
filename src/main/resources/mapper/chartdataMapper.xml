@@ -21,6 +21,7 @@
         <result column="project_name" property="projectName"/>
         <result column="project_type" property="projectType"/>
         <result column="finish_date_time" property="finishDateTime"/>
+        <result column="start_date_time" property="startDateTime"/>
         <result column="quality_score" property="quality_score"/>
         <result column="project_output" property="project_output"/>
         <result column="actuallyOut" property="actuallyOutput"/>
@@ -88,6 +89,7 @@
         project_group.group_id group_id,project_group.output_rate output_rate,
         project.project_name project_name,project_group.project_output project_output,
         project_group.project_actually_output actuallyOut,
+        project.project_start_date_time start_date_time,
         check_quality.finish_date_time finish_date_time,
         project.project_type
         from project_group

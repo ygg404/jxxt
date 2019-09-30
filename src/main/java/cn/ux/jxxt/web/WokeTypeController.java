@@ -106,4 +106,14 @@ public class WokeTypeController {
             return ResponseEntity.ok(message);
         }
     }
+
+    /**
+     * 通过项目编号 获取所有工作类型
+     * @return
+     */
+    @GetMapping(value = "/workType/getWtypeIdListByNo/{projectNo}")
+    public ResponseEntity<?> getWorkProjectTypeList(@PathVariable("projectNo") String projectNo){
+        WorkTypeDTO workTypeDTO = workTypeService.getWorkIdNotIn(projectNo);
+        return ResponseEntity.status(HttpStatus.CREATED).body(workTypeDTO.getWpTypeNotInList());
+    }
 }

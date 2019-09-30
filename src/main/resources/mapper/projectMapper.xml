@@ -487,6 +487,7 @@
             <if test="projectCharge != null">project_charge = #{projectCharge},</if>
             <if test="projectStageId != 0">project_stage = #{projectStageId},</if>
             <if test="projectProduce != null">project_produce = #{projectProduce},</if>
+            <if test="projectType != null">project_type = #{projectType},</if>
             <if test="projectStartDateTime != null">project_start_date_time = #{projectStartDateTime}</if>
         </trim>
         where project_no = #{projectNo}

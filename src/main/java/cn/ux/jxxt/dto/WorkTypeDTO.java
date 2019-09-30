@@ -1,5 +1,6 @@
 package cn.ux.jxxt.dto;
 
+import cn.ux.jxxt.domain.WorkProjectType;
 import cn.ux.jxxt.domain.WorkType;
 import cn.ux.jxxt.vo.Pagination;
 
@@ -20,6 +21,7 @@ public class WorkTypeDTO extends BasicDTO {
     private List<WorkType> typeList;
     private WorkType workType;
     private Pagination<WorkType> typePagination;
+    private List<Long> wpTypeNotInList;
 
     public Long getId() {
         return id;
@@ -92,4 +94,9 @@ public class WorkTypeDTO extends BasicDTO {
     public void setTypePagination(Pagination<WorkType> typePagination) {
         this.typePagination = typePagination;
     }
+
+    public List<Long> getWpTypeNotInList() { return  this.wpTypeNotInList;}
+
+    public void setWpTypeNotInList(List<Long> wpTypeNotInList){this.wpTypeNotInList = wpTypeNotInList;}
+
 }
