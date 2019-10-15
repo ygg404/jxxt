@@ -42,7 +42,9 @@
             <when test="desc == true">desc</when>
             <otherwise>asc</otherwise>
         </choose>
-        limit #{offset},#{per_page}
+        <if test="per_page != -1">
+            limit #{offset},#{per_page}
+        </if>
     </select>
 
     <insert id="addContractNoAddTime" parameterType="cn.ux.jxxt.domain.ContractData">

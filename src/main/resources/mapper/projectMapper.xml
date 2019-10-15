@@ -147,7 +147,9 @@
             <when test="desc == true">desc</when>
             <otherwise>asc</otherwise>
         </choose>
-        limit #{offset},#{per_page}
+        <if test="per_page != -1">
+            limit #{offset},#{per_page}
+        </if>
     </select>
 
     <select id="getProjectsByWork" resultMap="projectWrapRM">
@@ -191,7 +193,9 @@
             <when test="desc == true">desc</when>
             <otherwise>asc</otherwise>
         </choose>
-        limit #{offset},#{per_page}
+        <if test="per_page != -1">
+            limit #{offset},#{per_page}
+        </if>
     </select>
 
     <select id="getProjectsByAccount" resultMap="projectWrapRM">
@@ -219,13 +223,9 @@
         </choose>
         <if test="userAccount != null">and project.project_charge_account = #{userAccount}</if>
         <if test="groupId > 0">and project_group.group_id = #{groupId}</if>
-        <if test="stageId != null">and project.project_stage = #{stageId}</if>
-        <choose>
-            <when test="startDate != null">
-                and project.project_start_date_time between '${startDate}' and '${endDate}'
-            </when>
-            <otherwise>and project.project_start_date_time > DATE_SUB(CURDATE(), INTERVAL 2 MONTH) </otherwise>
-        </choose>
+        <if test="startDate != null">
+            and project.project_start_date_time between '${startDate}' and '${endDate}'
+        </if>
         <if test="search != null">and (project.project_no like '%${search}%'
             or project.project_name like '%${search}%'
             or project.project_num like '%${search}%'
@@ -236,7 +236,10 @@
             <when test="desc == true">desc</when>
             <otherwise>asc</otherwise>
         </choose>
-        limit #{offset},#{per_page}
+        <if test="per_page != -1">
+             limit #{offset},#{per_page}
+        </if>
+
     </select>
 
     <select id="getRecycleProject" resultMap="projectWrapRM">
@@ -278,7 +281,9 @@
             <when test="desc == true">desc</when>
             <otherwise>asc</otherwise>
         </choose>
-        limit #{offset},#{per_page}
+        <if test="per_page != -1">
+            limit #{offset},#{per_page}
+        </if>
     </select>
 
     <select id="getProjectBySetUp" resultMap="projectRM">
@@ -435,13 +440,9 @@
     </choose>
         <if test="userAccount != null">and project.project_charge_account = #{userAccount}</if>
         <if test="groupId > 0">and project_group.group_id = #{groupId}</if>
-        <if test="stageId != null">and project.project_stage = #{stageId}</if>
-        <choose>
-            <when test="startDate != null">
-                and project.project_start_date_time between '${startDate}' and '${endDate}'
-            </when>
-            <otherwise>and project.project_start_date_time > DATE_SUB(CURDATE(), INTERVAL 2 MONTH) </otherwise>
-        </choose>
+        <if test="startDate != null">
+            and project.project_start_date_time between '${startDate}' and '${endDate}'
+        </if>
         <if test="search != null">and (project.project_no like '%${search}%'
             or project.project_name like '%${search}%'
             or project.project_num like '%${search}%'
@@ -776,7 +777,9 @@
             <when test="desc == true">desc</when>
             <otherwise>asc</otherwise>
         </choose>
-        limit #{offset},#{per_page}
+        <if test="per_page != -1">
+            limit #{offset},#{per_page}
+        </if>
     </select>
 
     <resultMap id="getSchedule" type="cn.ux.jxxt.domain.ProjectSchedule">
@@ -930,30 +933,31 @@
     <!--</select>-->
 
     <select id="getScheduleDatalist" resultType="cn.ux.jxxt.domain.ProjectSchedule">
-        select a.id id,a.project_no projectNo,a.project_create_time projectCreateTime,
-        a.project_name projectName,a.project_rate projectRate,a.project_note projectNote,
-        a.project_actually_finish_date projectActuallyFinishDate,
+        select a.id id,a.project_no projectNo,a.project_create_date_time projectCreateTime,
+        a.project_name projectName,sch.project_rate projectRate,sch.project_note projectNote,
+        sch.project_actually_finish_date projectActuallyFinishDate,
         project_plan.project_work_date projectWorkDate,project_plan.project_quality_date projectQualityDate,
-        project_plan.project_begun_date_time projectBegunDate,
+        project_plan.project_begun_date_time projectBegunDate,project_plan.project_charge projectCharge,
         project_work.finish_date_time wFinishDateTime,check_quality.finish_date_time qFinishDateTime,check_quality.cut_off_time cFinishDateTime,
-        project.project_actually_finish_num projectActuallyFinishNum,
-        contract_project.contract_no contractNo
+        a.project_actually_finish_num projectActuallyFinishNum,
+        project_stage.name projectStage,contract_project.contract_no contractNo
 
-        from project_schedule a
+        from project a
         left join project_plan on project_plan.project_no = a.project_no
         left join project_work on project_work.project_no = a.project_no
         left join check_quality on check_quality.project_no = a.project_no
-        left join project on project.project_no = a.project_no
         left join contract_project on contract_project.project_no = a.project_no
-        where not exists (select * from project_schedule b where a.project_no = b.project_no and a.project_create_time &lt; project_create_time )
-        and (project.project_stage BETWEEN 3 and 6)
-        <if test="userAccount != null"> and project.project_charge_account = #{userAccount}</if>
+        LEFT JOIN project_stage on a.project_stage = project_stage.id
+        left join (SELECT s.* from (select project_no,max(project_create_time) as project_create_time from project_schedule GROUP BY project_no) maxs
+        LEFT JOIN project_schedule s  on maxs.project_no = s.project_no and s.project_create_time = maxs.project_create_time) sch
+        on sch.project_no = a.project_no
+        where 1=1
+        <if test="userAccount != null"> and a.project_charge_account = #{userAccount}</if>
 
-        <if test="startDate != null">and project_plan.project_begun_date_time between '${startDate}' and '${endDate}' </if>
+        <if test="startDate != null">and a.project_start_date_time between '${startDate}' and '${endDate}' </if>
 
 
         <if test="search != null">and (a.project_no like '%${search}%'
-            or a.project_note like '%${search}%'
             or a.project_name like '%${search}%')
         </if>
         order by ${sortBy}
@@ -961,25 +965,23 @@
             <when test="desc == true">desc</when>
             <otherwise>asc</otherwise>
         </choose>
-        limit #{offset},#{per_page}
+        <if test="per_page != -1">
+            limit #{offset},#{per_page}
+        </if>
     </select>
 
     <select id="getScheduleDataCount" resultType="java.lang.Long">
         select count(*)
-        from project_schedule a
+        from project a
         left join project_plan on project_plan.project_no = a.project_no
         left join project_work on project_work.project_no = a.project_no
         left join check_quality on check_quality.project_no = a.project_no
-        left join project on project.project_no = a.project_no
-        left join contract_project on contract_project.project_no = a.project_no
-        where not exists (select * from project_schedule b where a.project_no = b.project_no and a.project_create_time &lt; project_create_time )
-        and (project.project_stage BETWEEN 3 and 6)
-        <if test="userAccount != null"> and project.project_charge_account = #{userAccount}</if>
-        <if test="startDate != null">and project_plan.project_begun_date_time between '${startDate}' and '${endDate}' </if>
+        where  1 =1
+        <if test="userAccount != null"> and a.project_charge_account = #{userAccount}</if>
+        <if test="startDate != null">and a.project_start_date_time between '${startDate}' and '${endDate}' </if>
 
         <if test="search != null">and (a.project_no like '%${search}%'
-            or a.project_note like '%${search}%'
-            or a.project_name like '%${search}%')
+        or a.project_name like '%${search}%')
         </if>
     </select>
 
@@ -1114,7 +1116,9 @@
             <when test="desc == true">desc</when>
             <otherwise>asc</otherwise>
         </choose>
-        limit #{offset},#{per_page}
+        <if test="per_page != -1">
+            limit #{offset},#{per_page}
+        </if>
     </select>
 
     <delete id="deleteContractToProject">

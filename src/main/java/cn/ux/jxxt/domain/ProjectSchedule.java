@@ -30,6 +30,8 @@ public class ProjectSchedule {
     private String projectStartDate;                        //接口返回开工时间
     private int groupId;                                    //作业组id
     private String userAccount;                             //负责人账号
+    private String projectStage;                             //项目阶段内容
+    private String projectCharge;                           //项目负责人
 
     public long getId() {
         return id;
@@ -238,5 +240,13 @@ public class ProjectSchedule {
     public String getcDateTime() { return  this.cDateTime;}
 
     public void setcDateTime(String cDateTime){ this.cDateTime = cDateTime;}
+
+    public String getProjectStage(){return  this.projectStage;}
+
+    public void setProjectStage(String projectStage){this.projectStage = projectStage;}
+
+    public String getProjectCharge() { return  this.projectCharge;}
+
+    public void setProjectCharge(String projectCharge){ this.projectCharge = projectCharge;}
 }
 

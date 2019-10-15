@@ -1010,15 +1010,17 @@ public class ProjectServiceImpl implements ProjectService {
             }else{
                 schedule.setBackNum(0);
             }
-            schedule.setProjectCountDays(Float.parseFloat(schedule.getProjectWorkDate()) + Float.parseFloat(schedule.getProjectQualityDate()));         //设置项目要求总天数
-            if (schedule.getProjectBegunDate() != null && schedule.getqFinishDateTime() != null) {                                 //判断质量检查结束时间和作业结束时间是否为空
-                schedule.setProjectTotalDays(TextUtils.getDateNum(new SimpleDateFormat("yyyyMMdd").format(schedule.getProjectBegunDate()),
-                        new SimpleDateFormat("yyyyMMdd").format(schedule.getqFinishDateTime())));               //设置项目实际总天数
-            } else {
-                schedule.setProjectTotalDays(0);
+            if( schedule.getProjectWorkDate() != null && schedule.getProjectQualityDate() != null) {
+                schedule.setProjectCountDays(Float.parseFloat(schedule.getProjectWorkDate()) + Float.parseFloat(schedule.getProjectQualityDate()));         //设置项目要求总天数
+                if (schedule.getProjectBegunDate() != null && schedule.getqFinishDateTime() != null) {                                 //判断质量检查结束时间和作业结束时间是否为空
+                    schedule.setProjectTotalDays(TextUtils.getDateNum(new SimpleDateFormat("yyyyMMdd").format(schedule.getProjectBegunDate()),
+                            new SimpleDateFormat("yyyyMMdd").format(schedule.getqFinishDateTime())));               //设置项目实际总天数
+                } else {
+                    schedule.setProjectTotalDays(0);
+                }
             }
 
-            if (schedule.getqFinishDateTime() != null && schedule.getwFinishDateTime() != null) {
+            if (schedule.getqFinishDateTime() != null && schedule.getwFinishDateTime() != null && schedule.getProjectQualityDate() != null ) {
                 long outTime = (long)(schedule.getProjectTotalDays() - schedule.getProjectCountDays());
                 String qFinishTime = new SimpleDateFormat("yyyy-MM-dd").format(schedule.getqFinishDateTime());
                 String wFinishTime = new SimpleDateFormat("yyyy-MM-dd").format(schedule.getwFinishDateTime());
