@@ -1155,13 +1155,11 @@
         left join contract_project on contract_project.project_no = project.project_no
         left join work_group on project_group.group_id = work_group.id
         where p_stage = 1
-        <choose>
-            <when test="startDate != null">
-                and project.project_start_date_time between '${startDate}' and '${endDate}'
-            </when>
-            <otherwise>and DATE_FORMAT(project.project_start_date_time,'%Y %m') = date_format(DATE_SUB(curdate(), INTERVAL 0 MONTH),'%Y %m')</otherwise>
 
-        </choose>
+        <if test="startDate != null">
+            and project.project_start_date_time between '${startDate}' and '${endDate}'
+        </if>
+
 
         <if test="search != null">and (project.project_no like '%${search}%'
             or project.project_name like '%${search}%'
